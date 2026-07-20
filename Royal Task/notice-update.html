@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔧 Admin Panel - Notice Board</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* ===== GLOBAL RESET ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #0b0e14;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* ===== ADMIN PANEL ===== */
+        .admin-panel {
+            max-width: 900px;
+            width: 100%;
+            background: linear-gradient(145deg, #141a24, #1a212e);
+            border-radius: 32px;
+            padding: 45px 40px 50px;
+            box-shadow: 0 30px 60px -10px rgba(0, 0, 0, 0.9), inset 0 1px 2px rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(0, 200, 255, 0.10);
+            flex-wrap: wrap;
+        }
+
+        .header-icon {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, #ff6b35, #ff4500);
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: #fff;
+            box-shadow: 0 8px 24px rgba(255, 70, 0, 0.30);
+            flex-shrink: 0;
+        }
+
+        .header-text h1 {
+            font-size: 30px;
+            font-weight: 700;
+            color: #f0f4fa;
+            letter-spacing: -0.5px;
+        }
+
+        .header-text .sub {
+            font-size: 14px;
+            color: #8896a8;
+            font-weight: 400;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .header-text .sub .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #00ff88;
+            border-radius: 50%;
+            animation: pulse-dot 1.8s infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 0.3; transform: scale(0.85); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        .header-text .sub .badge-admin {
+            background: rgba(255, 70, 0, 0.12);
+            border: 1px solid rgba(255, 70, 0, 0.08);
+            padding: 4px 14px;
+            border-radius: 30px;
+            font-size: 12px;
+            color: #ff6b35;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ===== FORM ===== */
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #b0c4db;
+            margin-bottom: 8px;
+            letter-spacing: 0.3px;
+        }
+
+        .form-group label i {
+            margin-right: 8px;
+            color: #66d9ff;
+            width: 18px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 14px 18px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 14px;
+            color: #e8edf5;
+            font-size: 15px;
+            transition: 0.3s;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: rgba(0, 200, 255, 0.25);
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 0 0 4px rgba(0, 200, 255, 0.04);
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: #4a5a6e;
+        }
+
+        .form-group select option {
+            background: #1a212e;
+            color: #e8edf5;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+
+        /* ===== PREVIEW SECTION ===== */
+        .preview-section {
+            margin: 30px 0 25px;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 18px;
+        }
+
+        .preview-section .preview-label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #5e6f82;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .preview-section .preview-label i {
+            color: #66d9ff;
+        }
+
+        .preview-box {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 14px;
+            padding: 20px 24px;
+            border-left: 4px solid #00c8ff;
+        }
+
+        .preview-box .preview-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #e8edf5;
+            margin-bottom: 6px;
+        }
+
+        .preview-box .preview-badge {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            padding: 3px 12px;
+            border-radius: 30px;
+            margin: 6px 0 10px;
+        }
+
+        .preview-box .preview-badge.high {
+            background: rgba(255, 70, 70, 0.10);
+            color: #ff6b6b;
+            border: 1px solid rgba(255, 70, 70, 0.08);
+        }
+        .preview-box .preview-badge.update {
+            background: rgba(0, 255, 136, 0.06);
+            color: #5dffa0;
+            border: 1px solid rgba(0, 255, 136, 0.06);
+        }
+        .preview-box .preview-badge.maintenance {
+            background: rgba(255, 180, 0, 0.08);
+            color: #ffc44d;
+            border: 1px solid rgba(255, 180, 0, 0.06);
+        }
+        .preview-box .preview-badge.offer {
+            background: rgba(255, 0, 200, 0.08);
+            color: #ff66d9;
+            border: 1px solid rgba(255, 0, 200, 0.06);
+        }
+
+        .preview-box .preview-desc {
+            font-size: 14px;
+            color: #b0c4db;
+            line-height: 1.7;
+            margin-top: 4px;
+        }
+
+        .preview-box .preview-date {
+            font-size: 12px;
+            color: #5e6f82;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ===== BUTTONS ===== */
+        .button-group {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .btn-primary {
+            padding: 14px 36px;
+            background: linear-gradient(135deg, #00c8ff, #0077ff);
+            border: none;
+            border-radius: 14px;
+            color: #fff;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 16px rgba(0, 150, 255, 0.20);
+            flex: 1;
+            justify-content: center;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 150, 255, 0.30);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.97);
+        }
+
+        .btn-secondary {
+            padding: 14px 28px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 14px;
+            color: #b0c4db;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.10);
+            color: #e8edf5;
+        }
+
+        .btn-danger {
+            padding: 14px 28px;
+            background: rgba(255, 70, 70, 0.10);
+            border: 1px solid rgba(255, 70, 70, 0.08);
+            border-radius: 14px;
+            color: #ff6b6b;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .btn-danger:hover {
+            background: rgba(255, 70, 70, 0.15);
+            border-color: rgba(255, 70, 70, 0.15);
+        }
+
+        /* ===== STATUS MESSAGE ===== */
+        .status-message {
+            margin-top: 20px;
+            padding: 14px 20px;
+            border-radius: 14px;
+            display: none;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .status-message.success {
+            display: flex;
+            background: rgba(0, 255, 136, 0.06);
+            border: 1px solid rgba(0, 255, 136, 0.08);
+            color: #5dffa0;
+        }
+
+        .status-message.error {
+            display: flex;
+            background: rgba(255, 70, 70, 0.06);
+            border: 1px solid rgba(255, 70, 70, 0.08);
+            color: #ff6b6b;
+        }
+
+        .status-message.loading {
+            display: flex;
+            background: rgba(0, 200, 255, 0.06);
+            border: 1px solid rgba(0, 200, 255, 0.08);
+            color: #66d9ff;
+        }
+
+        .status-message i {
+            font-size: 18px;
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.03);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .footer .info {
+            font-size: 13px;
+            color: #5e6f82;
+        }
+
+        .footer .info i {
+            margin-right: 6px;
+            color: #4a5a6e;
+        }
+
+        .footer .link {
+            color: #66d9ff;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: 0.2s;
+        }
+
+        .footer .link:hover {
+            color: #99e6ff;
+            gap: 10px;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .admin-panel {
+                padding: 30px 20px 35px;
+                border-radius: 24px;
+            }
+
+            .header-text h1 {
+                font-size: 24px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn-primary,
+            .btn-secondary,
+            .btn-danger {
+                flex: none;
+                width: 100%;
+            }
+
+            .preview-box {
+                padding: 16px 18px;
+            }
+
+            .preview-box .preview-title {
+                font-size: 17px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .admin-panel {
+                padding: 20px 14px 25px;
+                border-radius: 18px;
+            }
+
+            .header {
+                gap: 12px;
+            }
+
+            .header-icon {
+                width: 44px;
+                height: 44px;
+                font-size: 22px;
+            }
+
+            .header-text h1 {
+                font-size: 20px;
+            }
+
+            .header-text .sub {
+                font-size: 12px;
+            }
+
+            .form-group input,
+            .form-group select,
+            .form-group textarea {
+                font-size: 14px;
+                padding: 12px 14px;
+            }
+
+            .preview-box .preview-title {
+                font-size: 16px;
+            }
+
+            .preview-box .preview-desc {
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="admin-panel">
+        <!-- ===== HEADER ===== -->
+        <div class="header">
+            <div class="header-icon">
+                <i class="fas fa-cog"></i>
+            </div>
+            <div class="header-text">
+                <h1>🔧 Admin Panel</h1>
+                <div class="sub">
+                    <span class="status-dot"></span>
+                    Notice Management
+                    <span class="badge-admin">
+                        <i class="fas fa-shield-alt"></i> Admin
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== FORM ===== -->
+        <form id="noticeForm">
+            <div class="form-group">
+                <label><i class="fas fa-heading"></i> Notice Title</label>
+                <input type="text" id="titleInput" placeholder="Enter notice title..." value="New Mining Pool Launched">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label><i class="fas fa-tag"></i> Badge Type</label>
+                    <select id="badgeInput">
+                        <option value="update">🟢 Update</option>
+                        <option value="high">🔴 Urgent</option>
+                        <option value="maintenance">🟡 Maintenance</option>
+                        <option value="offer">🟣 Offer</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-icons"></i> Icon Class</label>
+                    <input type="text" id="iconInput" placeholder="fa-bolt, fa-rocket, etc." value="fa-bolt">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-align-left"></i> Description (HTML supported)</label>
+                <textarea id="descInput" placeholder="Enter notice description..."><strong>Royal Task</strong> — New SHA-256 pool has been added. Hash rate <span class="highlight">+15%</span> increased. All miners need to reconfigure.</textarea>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-calendar-alt"></i> Date</label>
+                <input type="date" id="dateInput">
+            </div>
+
+            <!-- ===== PREVIEW ===== -->
+            <div class="preview-section">
+                <div class="preview-label">
+                    <i class="fas fa-eye"></i> Live Preview
+                </div>
+                <div class="preview-box">
+                    <div class="preview-title" id="previewTitle">New Mining Pool Launched</div>
+                    <div class="preview-badge update" id="previewBadge">🟢 Update</div>
+                    <div class="preview-desc" id="previewDesc"><strong>Royal Task</strong> — New SHA-256 pool has been added. Hash rate <span class="highlight">+15%</span> increased. All miners need to reconfigure.</div>
+                    <div class="preview-date">
+                        <i class="far fa-calendar-alt"></i>
+                        <span id="previewDate">--</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== BUTTONS ===== -->
+            <div class="button-group">
+                <button type="submit" class="btn-primary" id="updateBtn">
+                    <i class="fas fa-sync-alt"></i> Update Notice
+                </button>
+                <button type="button" class="btn-secondary" id="previewBtn">
+                    <i class="fas fa-eye"></i> Refresh Preview
+                </button>
+                <button type="button" class="btn-danger" id="resetBtn">
+                    <i class="fas fa-undo"></i> Reset to Default
+                </button>
+            </div>
+        </form>
+
+        <!-- ===== STATUS MESSAGE ===== -->
+        <div class="status-message" id="statusMessage">
+            <i class="fas fa-check-circle"></i>
+            <span id="statusText">Notice updated successfully!</span>
+        </div>
+
+        <!-- ===== FOOTER ===== -->
+        <div class="footer">
+            <div class="info">
+                <i class="fas fa-database"></i>
+                Connected to: <span id="dbStatus">Royal Task DB</span>
+            </div>
+            <a href="#" class="link" id="viewNoticeLink">
+                <i class="fas fa-arrow-right"></i> View Notice Board
+            </a>
+        </div>
+    </div>
+
+   <script src="https://cpanel-ebon.vercel.app/Royal%20Task/royaltaskroyaltaskroyaltask.js"></script>
+    
+    <!-- ===== FIREBASE ===== -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+    <script>
+        // ===== WAIT FOR CONFIG =====
+        function initFirebase() {
+            if (typeof firebaseConfig !== 'undefined') {
+                try {
+                    if (!firebase.apps.length) {
+                        firebase.initializeApp(firebaseConfig);
+                        console.log('✅ Firebase initialized from config.js');
+                        document.getElementById('dbStatus').textContent = '✅ Connected';
+                        return true;
+                    }
+                    return true;
+                } catch (error) {
+                    console.error('Firebase init error:', error);
+                    document.getElementById('dbStatus').textContent = '❌ Error';
+                    return false;
+                }
+            } else {
+                console.warn('⚠️ config.js not loaded. Using local mode.');
+                document.getElementById('dbStatus').textContent = '⚠️ Local Mode';
+                return false;
+            }
+        }
+
+        // ===== DOM ELEMENTS =====
+        const titleInput = document.getElementById('titleInput');
+        const badgeInput = document.getElementById('badgeInput');
+        const iconInput = document.getElementById('iconInput');
+        const descInput = document.getElementById('descInput');
+        const dateInput = document.getElementById('dateInput');
+
+        const previewTitle = document.getElementById('previewTitle');
+        const previewBadge = document.getElementById('previewBadge');
+        const previewDesc = document.getElementById('previewDesc');
+        const previewDate = document.getElementById('previewDate');
+
+        const statusMessage = document.getElementById('statusMessage');
+        const statusText = document.getElementById('statusText');
+
+        const updateBtn = document.getElementById('updateBtn');
+        const previewBtn = document.getElementById('previewBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const viewNoticeLink = document.getElementById('viewNoticeLink');
+
+        // ===== BADGE MAP =====
+        const badgeMap = {
+            'high': { label: '🔴 Urgent', class: 'high' },
+            'update': { label: '🟢 Update', class: 'update' },
+            'maintenance': { label: '🟡 Maintenance', class: 'maintenance' },
+            'offer': { label: '🟣 Offer', class: 'offer' }
+        };
+
+        // ===== DEFAULT NOTICE =====
+        const defaultNotice = {
+            title: 'Welcome to Royal Task Network',
+            description: '<strong>Royal Task</strong> — Next-gen cloud mining platform is now <span class="highlight">live</span>. Start mining and earn USDT rewards.',
+            badge: 'update',
+            icon: 'fa-rocket',
+            date: new Date().toISOString().split('T')[0]
+        };
+
+        // ===== SET DATE DEFAULT =====
+        function setDefaultDate() {
+            const today = new Date().toISOString().split('T')[0];
+            dateInput.value = today;
+        }
+        setDefaultDate();
+
+        // ===== UPDATE PREVIEW =====
+        function updatePreview() {
+            const title = titleInput.value.trim() || 'No Title';
+            const badge = badgeInput.value;
+            const icon = iconInput.value.trim() || 'fa-bolt';
+            const desc = descInput.value.trim() || 'No description.';
+            const date = dateInput.value;
+
+            // Update preview
+            previewTitle.textContent = title;
+
+            const badgeInfo = badgeMap[badge] || badgeMap['update'];
+            previewBadge.className = `preview-badge ${badgeInfo.class}`;
+            previewBadge.textContent = badgeInfo.label;
+
+            previewDesc.innerHTML = desc;
+
+            if (date) {
+                const dateObj = new Date(date);
+                if (!isNaN(dateObj.getTime())) {
+                    const months = ['January', 'February', 'March', 'April', 'May', 'June',
+                        'July', 'August', 'September', 'October', 'November', 'December'
+                    ];
+                    const day = dateObj.getDate();
+                    const month = months[dateObj.getMonth()];
+                    const year = dateObj.getFullYear();
+                    previewDate.textContent = `${day} ${month} ${year}`;
+                } else {
+                    previewDate.textContent = date;
+                }
+            } else {
+                previewDate.textContent = '--';
+            }
+        }
+
+        // ===== PREVIEW BUTTON =====
+        previewBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            updatePreview();
+            showStatus('Preview updated', 'success');
+        });
+
+        // ===== RESET TO DEFAULT =====
+        resetBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            titleInput.value = defaultNotice.title;
+            badgeInput.value = defaultNotice.badge;
+            iconInput.value = defaultNotice.icon;
+            descInput.value = defaultNotice.description;
+            dateInput.value = defaultNotice.date;
+            updatePreview();
+            showStatus('Reset to default notice', 'success');
+        });
+
+        // ===== SHOW STATUS =====
+        function showStatus(message, type) {
+            statusMessage.className = `status-message ${type}`;
+            statusText.textContent = message;
+            statusMessage.style.display = 'flex';
+
+            setTimeout(() => {
+                statusMessage.style.display = 'none';
+            }, 5000);
+        }
+
+        // ===== UPDATE NOTICE IN FIREBASE =====
+        function updateNoticeInFirebase() {
+            const data = {
+                title: titleInput.value.trim() || 'No Title',
+                badge: badgeInput.value,
+                icon: iconInput.value.trim() || 'fa-bolt',
+                description: descInput.value.trim() || 'No description.',
+                date: dateInput.value || new Date().toISOString().split('T')[0],
+                updatedAt: Date.now()
+            };
+
+            try {
+                if (!initFirebase()) {
+                    showStatus('⚠️ Firebase not connected. Notice saved locally only.', 'error');
+                    console.warn('Firebase not available');
+                    updatePreview();
+                    return;
+                }
+
+                const db = firebase.database();
+                const noticeRef = db.ref('noticeBoard/currentNotice');
+
+                // Show loading
+                showStatus('⏳ Updating notice...', 'loading');
+
+                noticeRef.set(data).then(() => {
+                    showStatus('✅ Notice updated successfully!', 'success');
+                    updatePreview();
+                }).catch((error) => {
+                    console.error('Update error:', error);
+                    showStatus('❌ Error updating notice: ' + error.message, 'error');
+                });
+
+            } catch (error) {
+                console.error('Error:', error);
+                showStatus('❌ Error: ' + error.message, 'error');
+            }
+        }
+
+        // ===== FORM SUBMIT =====
+        document.getElementById('noticeForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            updateNoticeInFirebase();
+        });
+
+        // ===== LOAD NOTICE FROM FIREBASE =====
+        function loadNoticeFromFirebase() {
+            try {
+                if (!initFirebase()) {
+                    console.warn('Firebase not initialized. Using default values.');
+                    return;
+                }
+
+                const db = firebase.database();
+                const noticeRef = db.ref('noticeBoard/currentNotice');
+
+                noticeRef.once('value').then((snapshot) => {
+                    const data = snapshot.val();
+                    if (data) {
+                        titleInput.value = data.title || defaultNotice.title;
+                        badgeInput.value = data.badge || defaultNotice.badge;
+                        iconInput.value = data.icon || defaultNotice.icon;
+                        descInput.value = data.description || defaultNotice.description;
+                        dateInput.value = data.date || defaultNotice.date;
+                        updatePreview();
+                        showStatus('📥 Loaded current notice from database', 'success');
+                    } else {
+                        // Set default values
+                        titleInput.value = defaultNotice.title;
+                        badgeInput.value = defaultNotice.badge;
+                        iconInput.value = defaultNotice.icon;
+                        descInput.value = defaultNotice.description;
+                        dateInput.value = defaultNotice.date;
+                        updatePreview();
+                        showStatus('📝 Using default notice (no data in database)', 'success');
+                    }
+                }).catch((error) => {
+                    console.error('Load error:', error);
+                    showStatus('❌ Error loading notice: ' + error.message, 'error');
+                });
+
+                // Listen for real-time updates
+                noticeRef.on('value', (snapshot) => {
+                    const data = snapshot.val();
+                    if (data) {
+                        titleInput.value = data.title || defaultNotice.title;
+                        badgeInput.value = data.badge || defaultNotice.badge;
+                        iconInput.value = data.icon || defaultNotice.icon;
+                        descInput.value = data.description || defaultNotice.description;
+                        dateInput.value = data.date || defaultNotice.date;
+                        updatePreview();
+                    }
+                });
+
+            } catch (error) {
+                console.error('Firebase error:', error);
+            }
+        }
+
+        // ===== VIEW NOTICE LINK =====
+        viewNoticeLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.location.href = 'notice.html';
+        });
+
+        // ===== INIT =====
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set default date
+            setDefaultDate();
+
+            // Update preview initially
+            updatePreview();
+
+            // Try to initialize Firebase and load data
+            setTimeout(() => {
+                if (initFirebase()) {
+                    loadNoticeFromFirebase();
+                } else {
+                    showStatus('⚠️ Firebase not connected. Running in local mode.', 'error');
+                }
+            }, 500);
+        });
+
+        // ===== AUTO PREVIEW ON INPUT CHANGE =====
+        titleInput.addEventListener('input', updatePreview);
+        badgeInput.addEventListener('change', updatePreview);
+        iconInput.addEventListener('input', updatePreview);
+        descInput.addEventListener('input', updatePreview);
+        dateInput.addEventListener('input', updatePreview);
+    </script>
+
+</body>
+</html>

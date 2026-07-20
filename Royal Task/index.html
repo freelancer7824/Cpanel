@@ -1,0 +1,1504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Mining Dashboard</title>
+    
+<meta property="og:title" content="Royal Task - Best Mining for Referral & Daily Earning">
+<meta property="og:description" content="Join Royal Task and start earning daily rewards through referrals and mining activities.">
+<meta property="og:image" content="https://royal-task.vercel.app/image.png">
+<meta property="og:url" content="https://royal-task.vercel.app">
+<meta property="og:type" content="website">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Royal Task - Best Mining for Referral & Daily Earning">
+<meta name="twitter:description" content="Join Royal Task and start earning daily rewards through referrals and mining activities.">
+<meta name="twitter:image" content="https://royal-task.vercel.app/image.png">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-dark: #090a0f;
+            --panel-dark: #121420;
+            --accent-glow: #00ffcc;
+            --accent-hover: #00b38f;
+            --text-main: #f1f3f9;
+            --text-muted: #8a94a6;
+            --border-color: rgba(255, 255, 255, 0.05);
+            --sidebar-width: 260px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        body, html {
+            height: 100%;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow: hidden;
+        }
+
+        /* --- Top Navbar --- */
+        .topnav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 70px;
+            background-color: rgba(18, 20, 32, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-main);
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 1100;
+            width: 40px;
+            height: 40px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            background: linear-gradient(45deg, #00ffcc, #0077ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo i {
+            font-size: 24px;
+            color: var(--accent-glow);
+            -webkit-text-fill-color: initial; 
+            text-shadow: 0 0 15px rgba(0, 255, 204, 0.6);
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .login-btn {
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-main);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 10px 22px;
+            cursor: pointer;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .login-btn i {
+            font-size: 14px;
+            color: var(--accent-glow);
+            transition: transform 0.3s ease;
+        }
+
+        .login-btn:hover {
+            background: var(--text-main);
+            color: #000;
+            border-color: var(--text-main);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(255, 255, 255, 0.15);
+        }
+        
+        .login-btn:hover i {
+            color: #000;
+            transform: translateX(3px);
+        }
+
+        /* ===== NOTIFICATION / NOTICE ICON ===== */
+        .notice-icon-wrapper {
+            position: relative;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            width: 42px;
+            height: 42px;
+            cursor: pointer;
+            border-radius: 50%;
+            background: rgba(0, 255, 204, 0.05);
+            border: 1.5px solid rgba(0, 255, 204, 0.15);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: var(--text-main);
+        }
+
+        .notice-icon-wrapper:hover {
+            background: rgba(0, 255, 204, 0.10);
+            border-color: rgba(0, 255, 204, 0.3);
+            transform: scale(1.05);
+        }
+
+        .notice-icon-wrapper i {
+            font-size: 18px;
+            color: var(--accent-glow);
+        }
+
+        .notice-live-dot {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            width: 10px;
+            height: 10px;
+            background: #ff3355;
+            border-radius: 50%;
+            border: 2px solid var(--panel-dark);
+            animation: livePulse 1.5s infinite ease-in-out;
+            box-shadow: 0 0 12px rgba(255, 51, 85, 0.6);
+        }
+
+        @keyframes livePulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.3); opacity: 0.6; }
+        }
+
+        .profile-icon-btn {
+            display: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(0, 255, 204, 0.05);
+            border: 1.5px solid rgba(0, 255, 204, 0.2);
+            color: var(--accent-glow);
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .profile-icon-btn:hover {
+            background: rgba(0, 255, 204, 0.1);
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.2);
+            transform: scale(1.05);
+        }
+
+        .blocked-badge {
+            display: none;
+            background: rgba(255, 68, 102, 0.1);
+            border: 1px solid rgba(255, 68, 102, 0.3);
+            color: #ff4466;
+            padding: 6px 16px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            animation: blockedPulse 2s infinite ease-in-out;
+        }
+
+        @keyframes blockedPulse {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; box-shadow: 0 0 12px rgba(255, 68, 102, 0.2); }
+        }
+
+        /* --- Toast Notification System --- */
+        #toastContainer {
+            position: fixed;
+            top: 85px;
+            right: 24px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .toast-msg {
+            background: rgba(18, 20, 32, 0.95);
+            border: 1px solid rgba(0, 255, 204, 0.2);
+            color: var(--text-main);
+            padding: 16px 22px;
+            border-radius: 14px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            transform: translateX(120%);
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            min-width: 280px;
+            backdrop-filter: blur(10px);
+        }
+
+        .toast-msg.show { transform: translateX(0); }
+        .toast-msg i { font-size: 20px; color: var(--accent-glow); }
+
+        .toast-text-container {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .toast-title { font-size: 14px; font-weight: 600; }
+        .toast-subtitle { font-size: 12px; color: var(--text-muted); }
+
+        .toast-msg.toast-error {
+            border-color: rgba(255, 68, 102, 0.3);
+        }
+        .toast-msg.toast-error i {
+            color: #ff4466;
+        }
+
+        /* --- Main Layout Wrapper --- */
+        .main-wrapper {
+            display: flex;
+            margin-top: 70px;
+            height: calc(100% - 70px);
+            position: relative;
+        }
+
+        /* --- Left Sidebar Panel --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--panel-dark);
+            height: 100%;
+            border-right: 1px solid var(--border-color);
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 99;
+            overflow-y: auto;
+        }
+
+        .sidebar-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            margin: 18px 0 8px 0;
+            padding-left: 12px;
+            font-weight: 600;
+        }
+        
+        .sidebar-title:first-child {
+            margin-top: 0;
+        }
+
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            color: var(--text-muted);
+            padding: 14px 16px;
+            text-decoration: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            gap: 14px;
+        }
+
+        .sidebar a i {
+            font-size: 18px;
+            width: 24px; 
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar a:hover {
+            color: var(--text-main);
+            background-color: rgba(255, 255, 255, 0.03);
+        }
+        
+        .sidebar a:hover i {
+            color: var(--text-main);
+        }
+
+        .sidebar a.active {
+            background: linear-gradient(90deg, rgba(0, 255, 204, 0.08) 0%, rgba(0, 255, 204, 0) 100%);
+            color: var(--accent-glow);
+            font-weight: 600;
+            border-left: 3px solid var(--accent-glow);
+            border-radius: 0 12px 12px 0; 
+        }
+        
+        .sidebar a.active i {
+            color: var(--accent-glow);
+        }
+
+        .sidebar a.nav-chat {
+            position: relative;
+        }
+        .sidebar a.nav-chat .chat-dot {
+            position: absolute;
+            top: 12px;
+            left: 32px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #00ffcc;
+            box-shadow: 0 0 8px rgba(0, 255, 204, 0.6);
+            animation: chatPulse 1.5s infinite ease-in-out;
+        }
+
+        @keyframes chatPulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.4); opacity: 0.6; }
+        }
+
+        .sidebar a.nav-blocked {
+            opacity: 0.3;
+            pointer-events: none;
+            cursor: not-allowed;
+        }
+        .sidebar a.nav-blocked i {
+            color: var(--text-muted) !important;
+        }
+
+        /* --- Content Dashboard Panel --- */
+        .content-container {
+            flex-grow: 1;
+            height: 100%;
+            background-color: var(--bg-dark);
+            position: relative;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background-color: transparent;
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 70px;
+            left: 0;
+            width: 100%;
+            height: calc(100% - 70px);
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(6px);
+            z-index: 90;
+        }
+
+        /* --- DAILY BONUS POPUP OVERLAY --- */
+        .daily-bonus-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .daily-bonus-overlay.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .daily-bonus-popup {
+            background: linear-gradient(145deg, #121420, #1a1d30);
+            border: 1px solid rgba(0, 255, 204, 0.2);
+            border-radius: 24px;
+            padding: 40px 35px;
+            max-width: 420px;
+            width: 90%;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8), 0 0 60px rgba(0, 255, 204, 0.05);
+            animation: popupSlideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popupSlideIn {
+            from { opacity: 0; transform: translateY(30px) scale(0.9); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .daily-bonus-popup .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            color: var(--text-muted);
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        .daily-bonus-popup .close-btn:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.1);
+            transform: rotate(90deg);
+        }
+
+        .daily-bonus-popup .bonus-icon {
+            font-size: 60px;
+            margin-bottom: 15px;
+            display: block;
+            animation: bounce 2s infinite ease-in-out;
+            filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.4));
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .daily-bonus-popup h2 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(45deg, #ffd700, #ffaa00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .daily-bonus-popup .bonus-amount {
+            font-size: 48px;
+            font-weight: 800;
+            color: var(--accent-glow);
+            margin: 15px 0;
+            text-shadow: 0 0 30px rgba(0, 255, 204, 0.3);
+        }
+
+        .daily-bonus-popup .bonus-amount span {
+            font-size: 20px;
+            color: var(--text-muted);
+            font-weight: 400;
+            text-shadow: none;
+        }
+
+        .daily-bonus-popup p {
+            color: var(--text-muted);
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .daily-bonus-popup .claim-btn {
+            background: linear-gradient(135deg, #00ffcc, #00b38f);
+            color: #000;
+            border: none;
+            padding: 14px 40px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 25px rgba(0, 255, 204, 0.3);
+        }
+
+        .daily-bonus-popup .claim-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 35px rgba(0, 255, 204, 0.4);
+        }
+
+        .daily-bonus-popup .claim-btn:active {
+            transform: translateY(0);
+        }
+
+        .daily-bonus-popup .claim-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .daily-bonus-popup .already-claimed {
+            color: var(--text-muted);
+            font-size: 14px;
+            display: none;
+        }
+
+        .daily-bonus-popup .already-claimed i {
+            color: var(--accent-glow);
+            margin-right: 6px;
+        }
+
+        .daily-bonus-popup .claim-btn.loading {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        .daily-bonus-popup .timer-text {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 12px;
+            display: none;
+        }
+
+        /* Claim success animation */
+        .claim-success-effect {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            border-radius: 24px;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .claim-success-effect::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, transparent, rgba(0, 255, 204, 0.1), transparent, rgba(0, 255, 204, 0.05), transparent);
+            animation: successSpin 2s ease-out forwards;
+        }
+
+        @keyframes successSpin {
+            from { transform: rotate(0deg); opacity: 1; }
+            to { transform: rotate(360deg); opacity: 0; }
+        }
+
+        /* --- RESPONSIVE CSS STYLING --- */
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: flex; 
+            }
+
+            .sidebar {
+                position: fixed;
+                left: calc(-1 * var(--sidebar-width)); 
+                top: 70px;
+                height: calc(100% - 70px);
+                box-shadow: 15px 0 40px rgba(0,0,0,0.6);
+            }
+
+            .sidebar.active {
+                left: 0; 
+            }
+
+            .sidebar-overlay.show {
+                display: block;
+            }
+
+            .blocked-badge {
+                font-size: 10px;
+                padding: 4px 10px;
+            }
+
+            .daily-bonus-popup {
+                padding: 30px 20px;
+                max-width: 90%;
+            }
+
+            .daily-bonus-popup .bonus-amount {
+                font-size: 36px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .login-btn {
+                padding: 8px 14px;
+                font-size: 13px;
+                border-radius: 8px;
+            }
+            .logo {
+                font-size: 18px;
+            }
+            .logo i {
+                font-size: 20px;
+            }
+            .toast-msg {
+                min-width: 240px;
+            }
+            .blocked-badge {
+                display: none !important;
+            }
+            .notice-icon-wrapper {
+                width: 36px;
+                height: 36px;
+            }
+            .notice-icon-wrapper i {
+                font-size: 16px;
+            }
+            .notice-live-dot {
+                width: 8px;
+                height: 8px;
+                top: 4px;
+                right: 4px;
+            }
+            .daily-bonus-popup .bonus-icon {
+                font-size: 40px;
+            }
+            .daily-bonus-popup h2 {
+                font-size: 20px;
+            }
+            .daily-bonus-popup .bonus-amount {
+                font-size: 30px;
+            }
+        }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #2a3048; border-radius: 20px; }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+
+    <div id="toastContainer"></div>
+
+    <!-- Daily Bonus Popup Overlay -->
+    <div class="daily-bonus-overlay" id="dailyBonusOverlay">
+        <div class="daily-bonus-popup" id="dailyBonusPopup">
+            <button class="close-btn" id="closeBonusPopup" title="Close">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="claim-success-effect" id="claimSuccessEffect" style="display:none;"></div>
+            <span class="bonus-icon">🎁</span>
+            <h2>Daily Bonus</h2>
+            <div class="bonus-amount">
+                +<span id="bonusAmount">0</span> <span>Coins</span>
+            </div>
+            <p id="bonusMessage">Claim your daily reward! Come back tomorrow for more.</p>
+            <button class="claim-btn" id="claimBonusBtn">
+                <i class="fa-solid fa-gift"></i> Claim Now
+            </button>
+            <div class="already-claimed" id="alreadyClaimed">
+                <i class="fa-solid fa-check-circle"></i> Already Claimed Today
+            </div>
+            <div class="timer-text" id="timerText">
+                <i class="fa-regular fa-clock"></i> Next bonus in: <span id="nextBonusTimer">--:--:--</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Navbar Section -->
+    <header class="topnav">
+        <div class="nav-left">
+            <button class="menu-toggle" id="menuBtn" aria-label="Toggle Navigation">
+                <i class="fa-solid fa-bars" id="toggleIcon"></i>
+            </button>
+            <div class="logo">
+                <i class="fa-solid fa-cubes-stacked"></i>
+                ROYAL TASK
+            </div>
+        </div>
+        <div class="nav-actions">
+            <span class="blocked-badge" id="blockedBadge">
+                <i class="fa-solid fa-ban" style="margin-right:4px;"></i> ACCOUNT BLOCKED
+            </span>
+
+            <a href="#" class="notice-icon-wrapper" id="noticeIcon" title="View Notices">
+                <i class="fa-solid fa-bell"></i>
+                <span class="notice-live-dot"></span>
+            </a>
+
+            <button class="login-btn" id="signInBtn">
+                <span>Sign In</span>
+                <i class="fa-solid fa-arrow-right-to-bracket"></i>
+            </button>
+            
+            <button class="profile-icon-btn" id="profileBtn" title="My Profile">
+                <i class="fa-solid fa-user"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Container Dynamic Dashboard Core -->
+    <div class="main-wrapper">
+        
+        <div class="sidebar-overlay" id="overlay"></div>
+
+        <!-- Left Sidebar Navigation Framework -->
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-title">Core Features</div>
+
+            <a class="nav-link" data-url="https://cpanel-ebon.vercel.app/Royal%20Task/dashboard " data-blockable="true">
+                <i class="fa-solid fa-gauge-high"></i> Dashboard
+            </a>
+            <a class="nav-link" data-url="../User/leaderboard" data-blockable="true">
+                <i class="fa-solid fa-trophy"></i> Leaderboard
+            </a>
+            <a class="nav-link" data-url="../User/vip-level-up" data-blockable="true">
+                <i class="fa-solid fa-crown"></i> Vip Level Up
+            </a>
+            
+            <a class="nav-link" data-url="../User/daily-bonus" data-blockable="true">
+    <i class="fa-solid fa-calendar-check"></i> Daily Bonus
+</a>
+            
+            <a class="nav-link" data-url="../User/level-claim" data-blockable="true">
+                <i class="fa-solid fa-gift"></i> Daily Claimed
+            </a>
+            <a class="nav-link" data-url="../User/referrals" data-blockable="true">
+                <i class="fa-solid fa-users"></i> Referrals
+            </a>
+            <a class="nav-link" data-url="../User/deposit" data-blockable="true">
+                <i class="fa-solid fa-money-bill-wave"></i> Deposit
+            </a>
+            <a class="nav-link" data-url="../User/deposit-history" data-blockable="true">
+                <i class="fa-solid fa-clock-rotate-left"></i> Deposit History
+            </a>
+            <a class="nav-link" data-url="../User/withdrawal" data-blockable="true">
+                <i class="fa-solid fa-wallet"></i> Withdrawal
+            </a>
+            <a class="nav-link" data-url="../User/withdraw-history" data-blockable="true">
+                <i class="fa-solid fa-file-invoice-dollar"></i> Withdraw History
+            </a>
+            
+            <div class="sidebar-title">Support</div>
+
+            <a class="nav-link" data-url="../User/profile" data-blockable="true">
+                <i class="fa-solid fa-user-gear"></i> Settings
+            </a>
+
+            <a class="nav-link nav-chat" data-url="../User/live-chat" data-blockable="false">
+                <i class="fa-solid fa-comments"></i> Helps Center
+                <span class="chat-dot"></span>
+            </a>
+        </nav>
+
+        <!-- Main Content (Iframe Area) -->
+        <main class="content-container">
+            <iframe id="main-frame" src="homepage" name="main-frame"></iframe>
+        </main>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://cpanel-ebon.vercel.app/Royal%20Task/royaltaskroyaltaskroyaltask.js"></script>
+
+    <script>
+        // ========================================
+        // FIREBASE INITIALIZATION
+        // ========================================
+        if (typeof firebaseConfig === 'undefined') {
+            console.error('config.js missing');
+        } else {
+            if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        }
+
+        const auth = firebase.auth();
+        const rtdb = firebase.database();
+
+        // ========================================
+        // GLOBAL STATE VARIABLES
+        // ========================================
+        let isUserLoggedIn = false;
+        let isUserBlocked = false;
+        let currentUserUid = null;
+        let statusListenerAttached = false;
+        let dailyBonusConfig = null;
+        let bonusConfigReady = false;
+        let bonusTimerInterval = null;
+        let isPopupShowing = false;
+        let pendingPopupRequest = false;
+
+        // ========================================
+        // DAILY BONUS CONFIG
+        // ========================================
+        rtdb.ref('admin/daily_bonus').on('value', (snapshot) => {
+            if (snapshot.exists()) {
+                dailyBonusConfig = snapshot.val();
+            } else {
+                dailyBonusConfig = {
+                    enabled: true,
+                    amount: 10,
+                    message: 'Claim your daily reward! Come back tomorrow for more.'
+                };
+            }
+            bonusConfigReady = true;
+
+            if (pendingPopupRequest) {
+                pendingPopupRequest = false;
+                showDailyBonusPopup();
+            }
+
+            console.log('[Bonus] Config loaded:', dailyBonusConfig);
+        }, (error) => {
+            console.error('[Bonus] Config read error:', error);
+            dailyBonusConfig = {
+                enabled: true,
+                amount: 10,
+                message: 'Claim your daily reward! Come back tomorrow for more.'
+            };
+            bonusConfigReady = true;
+
+            if (pendingPopupRequest) {
+                pendingPopupRequest = false;
+                showDailyBonusPopup();
+            }
+        });
+
+        // ========================================
+        // CHECK DAILY BONUS ELIGIBILITY
+        // ========================================
+        function checkDailyBonusEligibility(uid) {
+            return new Promise((resolve, reject) => {
+                const todayStart = new Date();
+                todayStart.setHours(0, 0, 0, 0);
+                const todayTimestamp = todayStart.getTime();
+
+                rtdb.ref('users/' + uid + '/dailyBonus/lastClaim').once('value', (snapshot) => {
+                    const lastClaim = snapshot.val() || 0;
+
+                    if (lastClaim >= todayTimestamp) {
+                        resolve({ eligible: false, claimed: true, lastClaim: lastClaim });
+                    } else {
+                        resolve({ eligible: true, claimed: false, lastClaim: lastClaim });
+                    }
+                }, (error) => {
+                    reject(error);
+                });
+            });
+        }
+
+        // ========================================
+        // CLAIM DAILY BONUS
+        // ========================================
+        function claimDailyBonus(uid, bonusAmount) {
+            return new Promise((resolve, reject) => {
+                const todayStart = new Date();
+                todayStart.setHours(0, 0, 0, 0);
+                const todayTimestamp = todayStart.getTime();
+
+                rtdb.ref('users/' + uid + '/dailyBonus/lastClaim').once('value', (snap) => {
+                    const existing = snap.val() || 0;
+                    if (existing >= todayTimestamp) {
+                        reject(new Error('ALREADY_CLAIMED_TODAY'));
+                        return;
+                    }
+
+                    rtdb.ref('users/' + uid).transaction((currentData) => {
+                        if (currentData === null) return currentData;
+
+                        const existingClaim = (currentData.dailyBonus && currentData.dailyBonus.lastClaim) || 0;
+                        if (existingClaim >= todayTimestamp) {
+                            return;
+                        }
+
+                        currentData.balance = (currentData.balance || 0) + bonusAmount;
+                        
+                        if (!currentData.dailyBonus) {
+                            currentData.dailyBonus = {};
+                        }
+                        currentData.dailyBonus.lastClaim = todayTimestamp;
+                        currentData.dailyBonus.amount = bonusAmount;
+                        currentData.dailyBonus.claimedAt = firebase.database.ServerValue.TIMESTAMP;
+
+                        return currentData;
+                    }, (error, committed, snapshot) => {
+                        if (error) {
+                            reject(error);
+                        } else if (!committed) {
+                            reject(new Error('ALREADY_CLAIMED_TODAY'));
+                        } else {
+                            resolve(snapshot.val());
+                        }
+                    });
+                }, (error) => {
+                    reject(error);
+                });
+            });
+        }
+
+        // ========================================
+        // SHOW DAILY BONUS POPUP
+        // ========================================
+        function showDailyBonusPopup() {
+            if (isPopupShowing) return;
+            if (!isUserLoggedIn || !currentUserUid) return;
+            if (isUserBlocked) return;
+
+            if (!bonusConfigReady) {
+                console.log('[Bonus] Config not ready, setting pending...');
+                pendingPopupRequest = true;
+                return;
+            }
+
+            const config = dailyBonusConfig;
+            if (!config || !config.enabled) {
+                console.log('[Bonus] Disabled by admin, skipping popup');
+                return;
+            }
+
+            const overlay = document.getElementById('dailyBonusOverlay');
+            const claimBtn = document.getElementById('claimBonusBtn');
+            const alreadyClaimed = document.getElementById('alreadyClaimed');
+            const timerText = document.getElementById('timerText');
+            const bonusAmountSpan = document.getElementById('bonusAmount');
+            const bonusMessage = document.getElementById('bonusMessage');
+            const successEffect = document.getElementById('claimSuccessEffect');
+            
+            claimBtn.style.display = 'inline-flex';
+            alreadyClaimed.style.display = 'none';
+            timerText.style.display = 'none';
+            successEffect.style.display = 'none';
+            claimBtn.disabled = false;
+            claimBtn.classList.remove('loading');
+            claimBtn.innerHTML = '<i class="fa-solid fa-gift"></i> Claim Now';
+
+            bonusAmountSpan.textContent = config.amount || 10;
+            bonusMessage.textContent = config.message || 'Claim your daily reward! Come back tomorrow for more.';
+
+            console.log('[Bonus] Checking eligibility for:', currentUserUid);
+
+            checkDailyBonusEligibility(currentUserUid).then((result) => {
+                console.log('[Bonus] Eligibility result:', result);
+
+                if (result.eligible) {
+                    claimBtn.style.display = 'inline-flex';
+                    alreadyClaimed.style.display = 'none';
+                    timerText.style.display = 'none';
+                } else {
+                    claimBtn.style.display = 'none';
+                    alreadyClaimed.style.display = 'block';
+                    timerText.style.display = 'block';
+
+                    const lastClaim = result.lastClaim || 0;
+                    const nextClaim = new Date(lastClaim);
+                    nextClaim.setDate(nextClaim.getDate() + 1);
+                    nextClaim.setHours(0, 0, 0, 0);
+                    updateTimerDisplay(nextClaim.getTime());
+                }
+
+                isPopupShowing = true;
+                overlay.classList.add('active');
+
+            }).catch((error) => {
+                console.error('[Bonus] Eligibility check error:', error);
+            });
+        }
+
+        // ========================================
+        // CLOSE POPUP
+        // ========================================
+        function closeBonusPopup() {
+            const overlay = document.getElementById('dailyBonusOverlay');
+            overlay.classList.remove('active');
+            isPopupShowing = false;
+            if (bonusTimerInterval) {
+                clearInterval(bonusTimerInterval);
+                bonusTimerInterval = null;
+            }
+        }
+
+        document.getElementById('closeBonusPopup').addEventListener('click', function(e) {
+            e.stopPropagation();
+            closeBonusPopup();
+        });
+
+        document.getElementById('dailyBonusOverlay').addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        });
+
+        document.getElementById('dailyBonusPopup').addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && isPopupShowing) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        }, true);
+
+        // ========================================
+        // TIMER DISPLAY
+        // ========================================
+        function updateTimerDisplay(nextClaimTime) {
+            const timerSpan = document.getElementById('nextBonusTimer');
+            
+            if (bonusTimerInterval) {
+                clearInterval(bonusTimerInterval);
+            }
+
+            function updateTimer() {
+                const now = Date.now();
+                const remaining = nextClaimTime - now;
+
+                if (remaining <= 0) {
+                    timerSpan.textContent = 'Available Now!';
+                    if (bonusTimerInterval) {
+                        clearInterval(bonusTimerInterval);
+                        bonusTimerInterval = null;
+                    }
+                    return;
+                }
+
+                const hours = Math.floor(remaining / (60 * 60 * 1000));
+                const minutes = Math.floor((remaining % (60 * 60 * 1000)) / (60 * 1000));
+                const seconds = Math.floor((remaining % (60 * 1000)) / 1000);
+
+                timerSpan.textContent = String(hours).padStart(2, '0') + ':' + String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+            }
+
+            updateTimer();
+            bonusTimerInterval = setInterval(updateTimer, 1000);
+        }
+
+        // ========================================
+        // 🔥🔥🔥 CLAIM BUTTON HANDLER — FIXED 🔥🔥🔥
+        // ========================================
+        document.getElementById('claimBonusBtn').addEventListener('click', function(e) {
+            e.stopPropagation();
+
+            if (!isUserLoggedIn || !currentUserUid) {
+                showToast("Access Denied", "Please sign in to claim bonus", "fa-solid fa-lock", true);
+                return;
+            }
+
+            if (isUserBlocked) {
+                showToast("Access Denied", "Your account is blocked", "fa-solid fa-ban", true);
+                return;
+            }
+
+            const btn = this;
+            const bonusAmount = parseInt(dailyBonusConfig?.amount || 10);
+
+            btn.disabled = true;
+            btn.classList.add('loading');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Claiming...';
+
+            claimDailyBonus(currentUserUid, bonusAmount).then((userData) => {
+                const successEffect = document.getElementById('claimSuccessEffect');
+                successEffect.style.display = 'block';
+                setTimeout(() => { successEffect.style.display = 'none'; }, 2000);
+
+                showToast("Bonus Claimed!", "You received " + bonusAmount + " coins!", "fa-solid fa-gift", false);
+
+                btn.style.display = 'none';
+                document.getElementById('alreadyClaimed').style.display = 'block';
+                document.getElementById('timerText').style.display = 'block';
+
+                const nextClaim = new Date();
+                nextClaim.setDate(nextClaim.getDate() + 1);
+                nextClaim.setHours(0, 0, 0, 0);
+                updateTimerDisplay(nextClaim.getTime());
+
+                console.log('[Bonus] Successfully claimed! Data saved in: users/' + currentUserUid + '/dailyBonus');
+                console.log('[Bonus] New balance:', userData.balance);
+
+                // ============================================================
+                // 🔥🔥🔥 SEND MESSAGE TO IFRAME (DASHBOARD) 🔥🔥🔥
+                // ============================================================
+                const iframe = document.getElementById('main-frame');
+                if (iframe && iframe.contentWindow) {
+                    console.log('[Bonus] 📨 Sending DAILY_BONUS_CLAIMED message to iframe...');
+                    try {
+                        iframe.contentWindow.postMessage({ 
+                            type: 'DAILY_BONUS_CLAIMED',
+                            amount: bonusAmount,
+                            newBalance: userData.balance 
+                        }, '*');
+                        console.log('[Bonus] ✅ Message sent successfully!');
+                    } catch (err) {
+                        console.error('[Bonus] Failed to send message:', err);
+                    }
+                } else {
+                    console.warn('[Bonus] ⚠️ Iframe not found or not ready');
+                }
+
+                // লোকাল স্টোরেজ সেট করুন (অন্য ট্যাবের জন্য)
+                localStorage.setItem('dailyBonusClaimed', Date.now().toString());
+
+            }).catch((error) => {
+                console.error('[Bonus] Claim error:', error);
+                
+                if (error.message === 'ALREADY_CLAIMED_TODAY') {
+                    btn.style.display = 'none';
+                    document.getElementById('alreadyClaimed').style.display = 'block';
+                    document.getElementById('timerText').style.display = 'block';
+                    
+                    const nextClaim = new Date();
+                    nextClaim.setDate(nextClaim.getDate() + 1);
+                    nextClaim.setHours(0, 0, 0, 0);
+                    updateTimerDisplay(nextClaim.getTime());
+
+                    showToast("Already Claimed", "You have already claimed today's bonus", "fa-solid fa-circle-info", true);
+                } else {
+                    showToast("Error", "Failed to claim bonus: " + error.message, "fa-solid fa-circle-exclamation", true);
+                }
+
+                btn.disabled = false;
+                btn.classList.remove('loading');
+                btn.innerHTML = '<i class="fa-solid fa-gift"></i> Claim Now';
+            });
+        });
+
+        // ========================================
+        // UI UPDATE AFTER LOGIN/LOGOUT
+        // ========================================
+        function updateUI(isLoggedIn) {
+            const noticeIcon = document.getElementById('noticeIcon');
+            
+            if (isLoggedIn) {
+                document.getElementById('signInBtn').style.display = 'none';
+                document.getElementById('profileBtn').style.display = 'flex';
+                noticeIcon.style.display = 'flex';
+                
+                setTimeout(() => {
+                    showDailyBonusPopup();
+                }, 1500);
+                
+            } else {
+                document.getElementById('signInBtn').style.display = 'flex';
+                document.getElementById('profileBtn').style.display = 'none';
+                noticeIcon.style.display = 'none';
+                
+                if (isPopupShowing) {
+                    closeBonusPopup();
+                }
+                pendingPopupRequest = false;
+
+                if (isUserBlocked) {
+                    setBlockedMode(false);
+                }
+            }
+        }
+
+        // ========================================
+        // BLOCKED MODE
+        // ========================================
+        function setBlockedMode(blocked) {
+            isUserBlocked = blocked;
+
+            const allLinks = document.querySelectorAll('.nav-link[data-blockable="true"]');
+            const chatLink = document.querySelector('.nav-link[data-blockable="false"]');
+            const badge = document.getElementById('blockedBadge');
+            const iframe = document.getElementById('main-frame');
+
+            if (blocked) {
+                badge.style.display = 'inline-flex';
+                allLinks.forEach(link => {
+                    link.classList.add('nav-blocked');
+                    link.classList.remove('active');
+                });
+
+                if (chatLink) {
+                    chatLink.classList.remove('nav-blocked');
+                    const anyActive = document.querySelector('.nav-link.active');
+                    if (!anyActive) {
+                        chatLink.classList.add('active');
+                    }
+                }
+
+                iframe.src = 'blocked.html';
+                showToast(
+                    "Account Restricted",
+                    "Your account has been blocked by admin. Contact support via Live Chat.",
+                    "fa-solid fa-shield-halved",
+                    true
+                );
+
+                if (isPopupShowing) closeBonusPopup();
+                pendingPopupRequest = false;
+
+            } else {
+                badge.style.display = 'none';
+                allLinks.forEach(link => {
+                    link.classList.remove('nav-blocked');
+                });
+
+                const dashboardLink = document.querySelector('.nav-link[data-url="../User/dashboard"]');
+                if (dashboardLink) {
+                    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                    dashboardLink.classList.add('active');
+                    iframe.src = '../User/dashboard';
+                } else {
+                    iframe.src = 'homepage';
+                }
+            }
+        }
+
+        // ========================================
+        // REALTIME STATUS LISTENER
+        // ========================================
+        function attachStatusListener(uid) {
+            if (statusListenerAttached) return;
+            statusListenerAttached = true;
+
+            rtdb.ref('users/' + uid + '/status').on('value', (snapshot) => {
+                const status = snapshot.val();
+                if (status === 'blocked') {
+                    if (!isUserBlocked) {
+                        setBlockedMode(true);
+                    }
+                } else {
+                    if (isUserBlocked) {
+                        setBlockedMode(false);
+                    }
+                }
+            });
+        }
+
+        // ========================================
+        // AUTH STATE
+        // ========================================
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedUser = localStorage.getItem('currentUser');
+            
+            if (savedUser) {
+                try {
+                    const userData = JSON.parse(savedUser);
+                    isUserLoggedIn = true;
+                    currentUserUid = userData.uid;
+                    updateUI(true);
+                    attachStatusListener(currentUserUid);
+
+                    auth.onAuthStateChanged((user) => {
+                        if (!user) {
+                            handleLogout();
+                        } else if (user.uid !== currentUserUid) {
+                            const oldUid = currentUserUid;
+                            currentUserUid = user.uid;
+                            localStorage.setItem('currentUser', JSON.stringify({
+                                uid: user.uid,
+                                email: user.email,
+                                displayName: user.displayName || "User",
+                                photoURL: user.photoURL || null
+                            }));
+
+                            if (oldUid) {
+                                rtdb.ref('users/' + oldUid + '/status').off();
+                            }
+                            statusListenerAttached = false;
+                            attachStatusListener(currentUserUid);
+
+                            if (isPopupShowing) closeBonusPopup();
+                            setTimeout(() => {
+                                showDailyBonusPopup();
+                            }, 1000);
+                        }
+                    });
+
+                } catch (e) {
+                    console.error("Local storage parse error", e);
+                    localStorage.removeItem('currentUser');
+                    updateUI(false);
+                }
+            } else {
+                auth.onAuthStateChanged(user => {
+                    if (user) {
+                        const userData = {
+                            uid: user.uid,
+                            email: user.email,
+                            displayName: user.displayName || "User",
+                            photoURL: user.photoURL || null
+                        };
+                        localStorage.setItem('currentUser', JSON.stringify(userData));
+                        isUserLoggedIn = true;
+                        currentUserUid = user.uid;
+                        updateUI(true);
+                        attachStatusListener(currentUserUid);
+                    } else {
+                        isUserLoggedIn = false;
+                        updateUI(false);
+                    }
+                });
+            }
+        });
+
+        // ========================================
+        // LOGOUT
+        // ========================================
+        function handleLogout() {
+            if (currentUserUid) {
+                rtdb.ref('users/' + currentUserUid + '/status').off();
+            }
+            statusListenerAttached = false;
+
+            auth.signOut().then(() => {
+                localStorage.removeItem('currentUser');
+                isUserLoggedIn = false;
+                isUserBlocked = false;
+                currentUserUid = null;
+                dailyBonusConfig = null;
+                bonusConfigReady = false;
+                updateUI(false);
+                document.getElementById('main-frame').src = 'homepage';
+            }).catch((error) => {
+                console.error("Sign out error", error);
+            });
+        }
+        
+        document.getElementById('profileBtn').addEventListener('click', () => {
+            if (isUserBlocked) {
+                showToast("Access Denied", "Blocked accounts cannot access settings.", "fa-solid fa-lock", true);
+                return;
+            }
+            document.getElementById('main-frame').src = '../User/profile';
+        });
+
+        // ========================================
+        // NOTICE ICON CLICK
+        // ========================================
+        document.getElementById('noticeIcon').addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            if (!isUserLoggedIn) {
+                showToast("Access Restricted", "Please sign in to view notices", "fa-solid fa-lock", false);
+                return;
+            }
+            
+            if (isUserBlocked) {
+                showToast("Access Denied", "Your account is blocked. Cannot view notices.", "fa-solid fa-ban", true);
+                return;
+            }
+            
+            document.getElementById('main-frame').src = '../User/notice';
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            
+            if (window.innerWidth <= 768 && sidebar.classList.contains('active')) {
+                toggleSidebar();
+            }
+        });
+
+        // ========================================
+        // TOAST NOTIFICATION
+        // ========================================
+        function showToast(title, subtitle, iconClass, isError) {
+            const container = document.getElementById('toastContainer');
+            
+            const toast = document.createElement('div');
+            toast.className = 'toast-msg' + (isError ? ' toast-error' : '');
+            toast.innerHTML = 
+                '<i class="' + iconClass + '"></i>' +
+                '<div class="toast-text-container">' +
+                    '<div class="toast-title">' + title + '</div>' +
+                    '<div class="toast-subtitle">' + subtitle + '</div>' +
+                '</div>';
+            
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.add('show'), 50);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 500);
+            }, 4000);
+        }
+
+        // ========================================
+        // NAVIGATION CLICK HANDLER
+        // ========================================
+        const links = document.querySelectorAll('.nav-link');
+        const iframe = document.getElementById('main-frame');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        const menuBtn = document.getElementById('menuBtn');
+        const toggleIcon = document.getElementById('toggleIcon');
+        const signInBtn = document.getElementById('signInBtn');
+
+        links.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+
+                if (!isUserLoggedIn) {
+                    showToast("Access Restricted", "Please sign in to continue", "fa-solid fa-lock", false);
+                    if (window.innerWidth <= 768 && sidebar.classList.contains('active')) {
+                        toggleSidebar();
+                    }
+                    return;
+                }
+
+                const isBlockable = this.getAttribute('data-blockable') === 'true';
+                if (isUserBlocked && isBlockable) {
+                    showToast(
+                        "Access Denied",
+                        "Your account is blocked. Only Live Chat is available.",
+                        "fa-solid fa-ban",
+                        true
+                    );
+                    if (window.innerWidth <= 768 && sidebar.classList.contains('active')) {
+                        toggleSidebar();
+                    }
+                    return;
+                }
+
+                if (isUserBlocked && !isBlockable) {
+                    links.forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
+                    iframe.src = this.getAttribute('data-url');
+                    
+                    if (window.innerWidth <= 768) toggleSidebar();
+                    return;
+                }
+
+                links.forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+                iframe.src = this.getAttribute('data-url');
+
+                if (window.innerWidth <= 768) {
+                    toggleSidebar();
+                }
+            });
+        });
+
+        signInBtn.addEventListener('click', () => {
+            iframe.src = '../User/login';
+        });
+
+        // ========================================
+        // MOBILE SIDEBAR TOGGLER
+        // ========================================
+        function toggleSidebar() {
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('show');
+            
+            if (sidebar.classList.contains('active')) {
+                toggleIcon.className = "fa-solid fa-xmark";
+            } else {
+                toggleIcon.className = "fa-solid fa-bars";
+            }
+        }
+
+        menuBtn.addEventListener('click', toggleSidebar);
+        overlay.addEventListener('click', toggleSidebar);
+    </script>
+</body>
+</html>

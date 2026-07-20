@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin · Full Screen Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: #07090f;
+            color: #f1f3f9;
+            min-height: 100vh;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 0rem;
+        }
+
+        .dashboard-wrap {
+            width: 100%;
+            max-width: 100%;
+            background: #0e111b;
+            border-radius: 28px;
+            padding: 1.5rem 1.8rem 1.8rem;
+            border: 1px solid rgba(255, 255, 255, 0.02);
+            box-shadow: 0 20px 50px -8px rgba(0, 0, 0, 0.9);
+            min-height: calc(100vh - 1.6rem);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .dash-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+        }
+        .dash-header h1 {
+            font-weight: 600;
+            font-size: 1.6rem;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .dash-header h1 i {
+            color: #00ffcc;
+        }
+        .badge-header {
+            background: #1a2035;
+            padding: 0.3rem 1.2rem;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: #bcc3d4;
+            border: 1px solid #2a3048;
+        }
+        .badge-header i {
+            margin-right: 6px;
+            color: #00ffcc;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .stat-card {
+            background: #0f121e;
+            border: 1px solid #1b212f;
+            border-radius: 22px;
+            padding: 1rem 1rem 0.8rem;
+            transition: 0.2s;
+        }
+        .stat-card:hover {
+            border-color: #2e3a5a;
+            background: #131826;
+        }
+        .stat-card .label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #7a86a2;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .stat-card .label i {
+            font-size: 0.75rem;
+            color: #00ffcc;
+        }
+        .stat-card .value {
+            font-size: 1.7rem;
+            font-weight: 700;
+            margin-top: 6px;
+            color: #f0f4ff;
+        }
+        .stat-card .sub {
+            font-size: 0.65rem;
+            color: #4e5a78;
+            margin-top: 4px;
+        }
+
+        .chart-row {
+            display: grid;
+            grid-template-columns: 2.4fr 1fr;
+            gap: 1.2rem;
+            margin-bottom: 1.5rem;
+            flex: 0 0 auto;
+        }
+        .chart-box {
+            background: #0f121e;
+            border: 1px solid #1b212f;
+            border-radius: 24px;
+            padding: 1rem 1.2rem 0.6rem;
+        }
+        .chart-box .chart-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            font-size: 0.75rem;
+            color: #9aa8c0;
+        }
+        .chart-box .chart-title span:last-child {
+            background: #1a2136;
+            padding: 0.15rem 0.9rem;
+            border-radius: 30px;
+            font-size: 0.6rem;
+            color: #bcc9f0;
+        }
+        .chart-container {
+            height: 140px;
+            position: relative;
+        }
+
+        .mini-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 0.7rem;
+        }
+        .mini-stat-item {
+            background: #0f121e;
+            border: 1px solid #1b212f;
+            border-radius: 18px;
+            padding: 0.75rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .mini-stat-item .left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .mini-stat-item .left i {
+            width: 28px;
+            height: 28px;
+            background: #1a2140;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #00ffcc;
+            font-size: 0.75rem;
+        }
+        .mini-stat-item .left .info .lbl {
+            font-size: 0.6rem;
+            color: #6a7a9c;
+            text-transform: uppercase;
+        }
+        .mini-stat-item .left .info .num {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        .mini-stat-item .trend {
+            font-size: 0.65rem;
+            color: #00ffcc;
+            background: #0d2a2a;
+            padding: 0.1rem 0.6rem;
+            border-radius: 40px;
+        }
+        .mini-stat-item .trend.down {
+            color: #ff7a7a;
+            background: #2a1515;
+        }
+
+        .section-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 0.8rem 0 0.6rem;
+        }
+        .section-title h3 {
+            font-weight: 500;
+            font-size: 0.95rem;
+            color: #d3def0;
+        }
+        .section-title small {
+            color: #4a5570;
+            font-size: 0.65rem;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 18px;
+            background: #0f121e;
+            border: 1px solid rgba(255, 255, 255, 0.02);
+            flex: 1 1 auto;
+            max-height: 420px;
+            overflow-y: auto;
+        }
+        .table-responsive table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.78rem;
+            min-width: 700px;
+        }
+        th {
+            text-align: left;
+            padding: 0.6rem 0.8rem 0.4rem;
+            color: #8f99b0;
+            font-weight: 500;
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            border-bottom: 1px solid #242b3f;
+            position: sticky;
+            top: 0;
+            background: #0f121e;
+            z-index: 5;
+        }
+        td {
+            padding: 0.6rem 0.8rem;
+            border-bottom: 1px solid #1a2032;
+            vertical-align: middle;
+        }
+        tr:last-child td {
+            border-bottom: none;
+        }
+        .user-cell {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .user-avatar {
+            width: 26px;
+            height: 26px;
+            border-radius: 8px;
+            background: #1f273f;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.55rem;
+            color: #00ffcc;
+            border: 1px solid #2a3452;
+            flex-shrink: 0;
+        }
+        .user-name {
+            font-weight: 500;
+            color: #eef2ff;
+            white-space: nowrap;
+            font-size: 0.75rem;
+        }
+        .user-email-small {
+            font-size: 0.55rem;
+            color: #4e5a78;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 110px;
+            display: block;
+        }
+        .status-dot {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.65rem;
+            font-weight: 500;
+        }
+        .status-dot .dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .status-dot .dot.active {
+            background: #00ffcc;
+            box-shadow: 0 0 6px rgba(0, 255, 204, 0.4);
+        }
+        .status-dot .dot.blocked {
+            background: #ff4466;
+            box-shadow: 0 0 6px rgba(255, 68, 102, 0.3);
+        }
+        .balance-badge {
+            background: #1a2140;
+            padding: 0.05rem 0.7rem;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: #b9c8ff;
+            display: inline-block;
+            white-space: nowrap;
+        }
+        .balance-badge.positive {
+            color: #00ffcc;
+            background: #0d2a2a;
+        }
+        .balance-badge.deposit {
+            color: #7dd3fc;
+            background: #0c2233;
+        }
+        .balance-badge.withdraw {
+            color: #fca5a5;
+            background: #2a1515;
+        }
+
+        .table-responsive::-webkit-scrollbar {
+            height: 4px;
+            width: 4px;
+        }
+        .table-responsive::-webkit-scrollbar-track {
+            background: #0c0f1a;
+        }
+        .table-responsive::-webkit-scrollbar-thumb {
+            background: #2b3450;
+            border-radius: 20px;
+        }
+
+        @media (max-width: 780px) {
+            .chart-row {
+                grid-template-columns: 1fr;
+            }
+            .dashboard-wrap {
+                padding: 1rem 0.8rem;
+                min-height: calc(100vh - 1rem);
+            }
+            .stat-card .value {
+                font-size: 1.3rem;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 0.7rem;
+            }
+        }
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 0.5rem;
+            }
+            .stat-card {
+                padding: 0.7rem 0.6rem;
+            }
+            .stat-card .value {
+                font-size: 1.1rem;
+            }
+            .dash-header h1 {
+                font-size: 1.2rem;
+            }
+            .badge-header {
+                font-size: 0.6rem;
+                padding: 0.2rem 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-wrap">
+
+        <div class="dash-header">
+            <h1><i class="fas fa-chart-pie"></i> Admin Panel</h1>
+            <span class="badge-header"><i class="fas fa-circle" style="font-size:0.35rem; color:#00ffcc;"></i> live · full screen</span>
+        </div>
+
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card">
+                <div class="label"><i class="fas fa-users"></i> Total Users</div>
+                <div class="value" id="totalUsers">--</div>
+                <div class="sub">all operators</div>
+            </div>
+            <div class="stat-card">
+                <div class="label"><i class="fas fa-user-check"></i> Active</div>
+                <div class="value" id="activeUsers">--</div>
+                <div class="sub">online now</div>
+            </div>
+            <div class="stat-card">
+                <div class="label"><i class="fas fa-coins"></i> Total Balance</div>
+                <div class="value" id="totalBalance">--</div>
+                <div class="sub">combined</div>
+            </div>
+            <div class="stat-card">
+                <div class="label"><i class="fas fa-arrow-trend-up"></i> Referrals</div>
+                <div class="value" id="totalReferrals">--</div>
+                <div class="sub">total refs</div>
+            </div>
+        </div>
+
+        <div class="chart-row">
+            <div class="chart-box">
+                <div class="chart-title">
+                    <span><i class="fas fa-rotate" style="margin-right:6px; animation: spin 6s linear infinite;"></i> Analytics Overview</span>
+                    <span>live</span>
+                </div>
+                <div class="chart-container">
+                    <canvas id="activityChart"></canvas>
+                </div>
+            </div>
+            <div class="mini-stats" id="miniStats">
+                <div class="mini-stat-item">
+                    <div class="left">
+                        <i class="fas fa-wallet"></i>
+                        <div class="info">
+                            <div class="lbl">Deposits</div>
+                            <div class="num" id="miniDeposit">$--</div>
+                        </div>
+                    </div>
+                    <span class="trend">+8.2%</span>
+                </div>
+                <div class="mini-stat-item">
+                    <div class="left">
+                        <i class="fas fa-arrow-right"></i>
+                        <div class="info">
+                            <div class="lbl">Withdrawals</div>
+                            <div class="num" id="miniWithdraw">$--</div>
+                        </div>
+                    </div>
+                    <span class="trend down">-2.4%</span>
+                </div>
+                <div class="mini-stat-item">
+                    <div class="left">
+                        <i class="fas fa-users"></i>
+                        <div class="info">
+                            <div class="lbl">Active Ref</div>
+                            <div class="num" id="miniActiveRef">--</div>
+                        </div>
+                    </div>
+                    <span class="trend">+5.7%</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-title">
+            <h3><i class="fas fa-list-ul" style="color:#00ffcc; margin-right:8px;"></i>All Operators</h3>
+            <small><i class="fas fa-sync-alt fa-spin"></i> auto-sync</small>
+        </div>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Status</th>
+                        <th>Balance</th>
+                        <th>Deposit</th>
+                        <th>Withdraw</th>
+                        <th>Ref</th>
+                    </tr>
+                </thead>
+                <tbody id="dashTableBody">
+                    <tr><td colspan="6" style="text-align:center; padding:1.5rem; color:#4a5570;"><i class="fas fa-spinner fa-spin"></i> loading operators...</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div style="margin-top:0.6rem; text-align:right; font-size:0.6rem; color:#3d4866;">
+            <i class="fas fa-shield-alt"></i> secured · admin
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://cpanel-ebon.vercel.app/Royal%20Task/royaltaskroyaltaskroyaltask.js"></script>
+
+    <style>
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .chart-container canvas {
+            animation: fadeIn 1s ease;
+        }
+        @keyframes fadeIn {
+            0% { opacity: 0.2; transform: scale(0.98); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof firebaseConfig === 'undefined') {
+                document.getElementById('dashTableBody').innerHTML =
+                    `<tr><td colspan="6" style="text-align:center; padding:1.5rem; color:#ff7a7a;"><i class="fas fa-triangle-exclamation"></i> config.js missing</td></tr>`;
+                return;
+            }
+            if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+            const rtdb = firebase.database();
+            const auth = firebase.auth();
+
+            const ADMIN_UID = "JibfgzFlrUXF9g9sIX0eMGsWE9N2";
+
+            auth.onAuthStateChanged((user) => {
+                if (!user) {
+                    window.location.href = "login.html";
+                    return;
+                }
+                if (user.uid !== ADMIN_UID) {
+                    document.getElementById('dashTableBody').innerHTML =
+                        `<tr><td colspan="6" style="text-align:center; padding:1.5rem; color:#ff7a7a;"><i class="fas fa-lock"></i> access denied</td></tr>`;
+                    return;
+                }
+                loadDashboard();
+            });
+
+            function loadDashboard() {
+                rtdb.ref('users').on('value', (snapshot) => {
+                    const users = snapshot.val() || {};
+                    const keys = Object.keys(users);
+
+                    if (keys.length === 0) {
+                        document.getElementById('dashTableBody').innerHTML =
+                            `<tr><td colspan="6" style="text-align:center; padding:1.5rem; color:#4a5570;">no operators</td></tr>`;
+                        updateStatsAndCharts({});
+                        return;
+                    }
+
+                    let html = '';
+                    keys.forEach(uid => {
+                        const u = users[uid];
+                        if (!u) return;
+                        const initials = getInitials(u.fullName || 'Unknown');
+                        const name = u.fullName || 'No Name';
+                        const email = u.email || '';
+                        // CRITICAL: Using 'deposit-balance' to show deposit balance
+                        const bal = u.balance || 0;
+                        const dep = u['deposit-balance'] || 0;  // deposit balance shown here
+                        const wd = u['withdraw-balance'] || 0;
+                        const ref = u.referralCount || 0;
+                        const status = u.status || 'active';
+                        html += `
+                            <tr>
+                                <td>
+                                    <div class="user-cell">
+                                        <span class="user-avatar">${initials}</span>
+                                        <div>
+                                            <span class="user-name">${escapeHtml(name)}</span>
+                                            <span class="user-email-small">${escapeHtml(email)}</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="status-dot"><span class="dot ${status}"></span>${status}</span></td>
+                                <td><span class="balance-badge ${bal > 0 ? 'positive' : ''}">$${bal.toLocaleString()}</span></td>
+                                <td><span class="balance-badge deposit">$${dep.toLocaleString()}</span></td>
+                                <td><span class="balance-badge withdraw">$${wd.toLocaleString()}</span></td>
+                                <td>${ref}</td>
+                            </tr>
+                        `;
+                    });
+                    if (html === '') {
+                        html =
+                            `<tr><td colspan="6" style="text-align:center; padding:1.2rem; color:#4a5570;">no data</td></tr>`;
+                    }
+                    document.getElementById('dashTableBody').innerHTML = html;
+
+                    updateStatsAndCharts(users);
+                });
+            }
+
+            function updateStatsAndCharts(users) {
+                const keys = Object.keys(users);
+                let total = keys.length;
+                let active = 0,
+                    blocked = 0;
+                let totalBal = 0,
+                    totalRef = 0;
+                let totalDeposit = 0,
+                    totalWithdraw = 0;
+                let activeRefSum = 0;
+
+                keys.forEach(uid => {
+                    const u = users[uid];
+                    if (!u) return;
+                    const s = u.status || 'active';
+                    if (s === 'active') active++;
+                    else if (s === 'blocked') blocked++;
+                    totalBal += (u.balance || 0);
+                    totalRef += (u.referralCount || 0);
+                    totalDeposit += (u['deposit-balance'] || 0);
+                    totalWithdraw += (u['withdraw-balance'] || 0);
+                    activeRefSum += (u.activeReferrals || 0);
+                });
+
+                document.getElementById('totalUsers').textContent = total;
+                document.getElementById('activeUsers').textContent = active;
+                document.getElementById('totalBalance').textContent = '$' + totalBal.toLocaleString();
+                document.getElementById('totalReferrals').textContent = totalRef;
+
+                document.getElementById('miniDeposit').textContent = '$' + totalDeposit.toLocaleString();
+                document.getElementById('miniWithdraw').textContent = '$' + totalWithdraw.toLocaleString();
+                document.getElementById('miniActiveRef').textContent = activeRefSum;
+
+                updateChart(totalDeposit, totalWithdraw, active, blocked);
+            }
+
+            let chartInstance = null;
+
+            function updateChart(deposit, withdraw, active, blocked) {
+                const ctx = document.getElementById('activityChart').getContext('2d');
+                if (chartInstance) chartInstance.destroy();
+
+                chartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Deposit', 'Withdraw', 'Active', 'Blocked'],
+                        datasets: [{
+                            label: 'Overview',
+                            data: [deposit, withdraw, active, blocked],
+                            backgroundColor: ['#00ffcc', '#4d7aff', '#00c9a7', '#ff6670'],
+                            borderRadius: 8,
+                            borderSkipped: false,
+                            barThickness: 34,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: { backgroundColor: '#1a2140', titleColor: '#f0f4ff',
+                            bodyColor: '#bcc9f0' }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: 'rgba(255,255,255,0.03)' },
+                                ticks: { color: '#6a7a9c', font: { size: 9 } }
+                            },
+                            x: {
+                                grid: { display: false },
+                                ticks: { color: '#6a7a9c', font: { size: 9 } }
+                            }
+                        }
+                    }
+                });
+            }
+
+            function getInitials(name) {
+                const parts = name.trim().split(/\s+/);
+                if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+                return name.substring(0, 2).toUpperCase();
+            }
+
+            function escapeHtml(str) {
+                const d = document.createElement('div');
+                d.textContent = str;
+                return d.innerHTML;
+            }
+
+            setTimeout(() => {
+                if (!chartInstance) {
+                    const ctx = document.getElementById('activityChart').getContext('2d');
+                    chartInstance = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Deposit', 'Withdraw', 'Active', 'Blocked'],
+                            datasets: [{ label: 'Overview', data: [0, 0, 0, 0], backgroundColor: ['#2a3452',
+                                    '#2a3452', '#2a3452', '#2a3452'
+                                ], borderRadius: 8, barThickness: 34 }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { display: false } },
+                            scales: {
+                                y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.03)' },
+                                    ticks: { color: '#6a7a9c', font: { size: 9 } } },
+                                x: { grid: { display: false }, ticks: { color: '#6a7a9c', font: { size: 9 } } }
+                            }
+                        }
+                    });
+                }
+            }, 700);
+        });
+    </script>
+</body>
+</html>

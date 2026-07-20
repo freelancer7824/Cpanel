@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Royal Task - Admin Panel (Daily Bonus)</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-dark: #090a0f;
+            --panel-dark: #121420;
+            --accent-glow: #00ffcc;
+            --accent-hover: #00b38f;
+            --text-main: #f1f3f9;
+            --text-muted: #8a94a6;
+            --border-color: rgba(255, 255, 255, 0.05);
+            --input-bg: #1a1d30;
+            --error-color: #ff3366;
+            --success-color: #00ffcc;
+            --warning-color: #ffbb33;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* --- Admin Container --- */
+        .admin-container {
+            max-width: 500px;
+            width: 100%;
+        }
+
+        /* --- Navigation --- */
+        .nav-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 25px;
+            background: var(--panel-dark);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 30px;
+        }
+
+        .nav-brand {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--accent-glow);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-brand i {
+            font-size: 22px;
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 8px 16px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 13px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        .nav-btn:hover {
+            background: rgba(0, 255, 204, 0.1);
+            color: var(--accent-glow);
+            border-color: var(--accent-glow);
+        }
+
+        .nav-btn.logout {
+            color: var(--error-color);
+        }
+
+        .nav-btn.logout:hover {
+            background: rgba(255, 51, 102, 0.1);
+            border-color: var(--error-color);
+        }
+
+        /* --- Card --- */
+        .admin-card {
+            background: var(--panel-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 35px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .admin-card::before {
+            content: '';
+            position: absolute;
+            top: -80px;
+            right: -80px;
+            width: 200px;
+            height: 200px;
+            background: var(--accent-glow);
+            opacity: 0.02;
+            filter: blur(60px);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .admin-card .card-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-main);
+        }
+
+        .admin-card .card-title i {
+            color: var(--accent-glow);
+            font-size: 24px;
+        }
+
+        /* --- Form Elements --- */
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .input-label {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            display: block;
+            font-weight: 600;
+        }
+
+        .input-block {
+            display: flex;
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 14px 18px;
+            align-items: center;
+            gap: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .input-block:focus-within {
+            border-color: rgba(0, 255, 204, 0.3);
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.03);
+        }
+
+        .input-block i {
+            color: var(--text-muted);
+            font-size: 18px;
+            width: 20px;
+            text-align: center;
+            transition: color 0.3s ease;
+        }
+
+        .input-block:focus-within i {
+            color: var(--accent-glow);
+        }
+
+        .input-block input {
+            flex-grow: 1;
+            background: none;
+            border: none;
+            color: var(--text-main);
+            outline: none;
+            font-size: 18px;
+            font-weight: 600;
+            width: 100%;
+        }
+
+        .input-block input::placeholder {
+            color: rgba(255, 255, 255, 0.2);
+            font-weight: 400;
+        }
+
+        /* Allow decimal input */
+        .input-block input[type="number"] {
+            -moz-appearance: textfield;
+            appearance: textfield;
+        }
+
+        .input-block input[type="number"]::-webkit-inner-spin-button,
+        .input-block input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* --- Toggle Switch --- */
+        .toggle-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 4px 0;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 56px;
+            height: 30px;
+            background: var(--input-bg);
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid var(--border-color);
+            flex-shrink: 0;
+        }
+
+        .toggle-switch.active {
+            background: var(--accent-glow);
+            border-color: var(--accent-glow);
+        }
+
+        .toggle-switch .toggle-knob {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 22px;
+            height: 22px;
+            background: var(--text-muted);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-switch.active .toggle-knob {
+            left: 28px;
+            background: #000;
+        }
+
+        .toggle-label {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-muted);
+            transition: color 0.3s ease;
+        }
+
+        .toggle-label.active {
+            color: var(--accent-glow);
+        }
+
+        .toggle-status-text {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 6px;
+            display: block;
+        }
+
+        .toggle-status-text i {
+            margin-right: 6px;
+        }
+
+        /* --- Buttons --- */
+        .btn {
+            padding: 14px 28px;
+            border-radius: 12px;
+            border: none;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00ffcc 0%, #00b38f 100%);
+            color: #000;
+        }
+
+        .btn-primary:hover {
+            transform: scale(0.98);
+            opacity: 0.9;
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* --- Current Value Display --- */
+        .current-value {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-top: 20px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .current-value .label {
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .current-value .value {
+            color: var(--accent-glow);
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .current-value .value.inactive {
+            color: var(--error-color);
+        }
+
+        /* --- Toast Notification --- */
+        .toast-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(18, 20, 32, 0.95);
+            border: 1px solid var(--border-color);
+            padding: 14px 22px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            max-width: 90%;
+        }
+
+        .toast-notification.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .toast-icon { font-size: 18px; }
+        .toast-message { font-size: 14px; font-weight: 500; }
+        
+        .toast-notification.success { border-left: 4px solid var(--success-color); }
+        .toast-notification.success .toast-icon { color: var(--success-color); }
+        .toast-notification.error { border-left: 4px solid var(--error-color); }
+        .toast-notification.error .toast-icon { color: var(--error-color); }
+
+        /* --- Loading Spinner --- */
+        .spinner {
+            display: inline-block;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* --- Responsive --- */
+        @media (max-width: 480px) {
+            .admin-card {
+                padding: 24px 20px;
+            }
+
+            .nav-header {
+                flex-direction: column;
+                gap: 12px;
+                text-align: center;
+                padding: 12px 18px;
+            }
+
+            .nav-actions {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .current-value {
+                flex-direction: column;
+                gap: 6px;
+                text-align: center;
+            }
+
+            .input-block input {
+                font-size: 16px;
+            }
+
+            .btn {
+                font-size: 14px;
+                padding: 12px 20px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .admin-card {
+                padding: 18px 14px;
+            }
+
+            .toggle-wrapper {
+                flex-wrap: wrap;
+            }
+
+            .toggle-label {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast-notification">
+        <i id="toast-icon" class="fa-solid fa-circle-check toast-icon"></i>
+        <span id="toast-msg" class="toast-message">Operation Successful</span>
+    </div>
+
+    <div class="admin-container">
+        
+        <!-- Navigation -->
+        <nav class="nav-header">
+            <a href="dashboard.html" class="nav-brand">
+                <i class="fa-solid fa-crown"></i> Admin Panel
+            </a>
+            <div class="nav-actions">
+                <button id="logout-btn" class="nav-btn logout">
+                    <i class="fa-solid fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </nav>
+
+        <!-- Daily Bonus Settings -->
+        <div class="admin-card">
+            <div class="card-title">
+                <i class="fa-solid fa-gift"></i> Daily Claim Bonus
+            </div>
+
+            <form id="bonus-form">
+                <!-- Enable/Disable -->
+                <div class="form-group">
+                    <label class="input-label">Bonus Status</label>
+                    <div class="toggle-wrapper">
+                        <div class="toggle-switch" id="bonusToggle">
+                            <div class="toggle-knob"></div>
+                        </div>
+                        <span class="toggle-label" id="toggleLabel">Disabled</span>
+                    </div>
+                    <span class="toggle-status-text" id="statusText">
+                        <i class="fa-solid fa-circle" style="color: var(--error-color);"></i> Currently Inactive
+                    </span>
+                </div>
+
+                <!-- Bonus Amount -->
+                <div class="form-group">
+                    <label class="input-label">Bonus Amount (Coins)</label>
+                    <div class="input-block">
+                        <i class="fa-solid fa-coins"></i>
+                        <input type="number" id="bonusAmount" placeholder="Enter amount" step="0.01" min="0.01" required>
+                    </div>
+                    <span style="font-size: 12px; color: var(--text-muted); display: block; margin-top: 6px;">
+                        <i class="fa-solid fa-info-circle"></i> You can use decimal values (e.g., 0.01, 1.50, 10.00)
+                    </span>
+                </div>
+
+                <!-- Current Settings Display -->
+                <div class="current-value">
+                    <span class="label">Current Bonus:</span>
+                    <span class="value" id="currentBonusDisplay">0 Coins</span>
+                </div>
+
+                <div class="current-value" style="margin-top: 10px;">
+                    <span class="label">Status:</span>
+                    <span class="value" id="currentStatusDisplay">Inactive</span>
+                </div>
+
+                <!-- Save Button -->
+                <button type="submit" class="btn btn-primary" id="saveBtn" style="margin-top: 25px;">
+                    <i class="fa-solid fa-floppy-disk"></i> Save Settings
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://cpanel-ebon.vercel.app/Royal%20Task/royaltaskroyaltaskroyaltask.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            if (typeof firebaseConfig === 'undefined') {
+                showToast("Configuration Error: Firebase config not found", "error");
+                return;
+            }
+
+            // Initialize Firebase
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+            }
+            const auth = firebase.auth();
+            const rtdb = firebase.database();
+
+            // --- DOM References ---
+            const bonusToggle = document.getElementById('bonusToggle');
+            const toggleLabel = document.getElementById('toggleLabel');
+            const statusText = document.getElementById('statusText');
+            const bonusAmount = document.getElementById('bonusAmount');
+            const saveBtn = document.getElementById('saveBtn');
+            const logoutBtn = document.getElementById('logout-btn');
+            const currentBonusDisplay = document.getElementById('currentBonusDisplay');
+            const currentStatusDisplay = document.getElementById('currentStatusDisplay');
+
+            // --- State ---
+            let currentConfig = null;
+
+            // --- Toast ---
+            function showToast(message, type = 'success') {
+                const toast = document.getElementById('toast');
+                const toastMsg = document.getElementById('toast-msg');
+                const toastIcon = document.getElementById('toast-icon');
+
+                toastMsg.textContent = message;
+                toast.className = `toast-notification ${type} active`;
+
+                if (type === 'success') {
+                    toastIcon.className = 'fa-solid fa-circle-check toast-icon';
+                } else if (type === 'error') {
+                    toastIcon.className = 'fa-solid fa-circle-exclamation toast-icon';
+                }
+
+                clearTimeout(toast._timeout);
+                toast._timeout = setTimeout(() => {
+                    toast.classList.remove('active');
+                }, 4000);
+            }
+
+            // --- Update Status Display ---
+            function updateStatusDisplay(enabled) {
+                if (enabled) {
+                    statusText.innerHTML = `<i class="fa-solid fa-circle" style="color: var(--success-color);"></i> Currently Active`;
+                    currentStatusDisplay.textContent = '✅ Active';
+                    currentStatusDisplay.style.color = 'var(--success-color)';
+                } else {
+                    statusText.innerHTML = `<i class="fa-solid fa-circle" style="color: var(--error-color);"></i> Currently Inactive`;
+                    currentStatusDisplay.textContent = '❌ Inactive';
+                    currentStatusDisplay.style.color = 'var(--error-color)';
+                }
+            }
+
+            // --- Update Display ---
+            function updateDisplay(config) {
+                // Update toggle
+                if (config.enabled) {
+                    bonusToggle.classList.add('active');
+                    toggleLabel.textContent = 'Enabled';
+                    toggleLabel.className = 'toggle-label active';
+                } else {
+                    bonusToggle.classList.remove('active');
+                    toggleLabel.textContent = 'Disabled';
+                    toggleLabel.className = 'toggle-label';
+                }
+
+                // Update status
+                updateStatusDisplay(config.enabled);
+
+                // Update amount - parse as float to handle decimals
+                const amount = parseFloat(config.amount) || 0;
+                bonusAmount.value = amount;
+
+                // Update current display
+                currentBonusDisplay.textContent = `${amount.toFixed(2)} Coins`;
+                currentBonusDisplay.style.color = 'var(--accent-glow)';
+            }
+
+            // --- Load Config from Firebase ---
+            function loadConfig() {
+                rtdb.ref('admin/daily_bonus').on('value', (snapshot) => {
+                    if (snapshot.exists()) {
+                        currentConfig = snapshot.val();
+                        updateDisplay(currentConfig);
+                    } else {
+                        // Default config
+                        currentConfig = {
+                            enabled: false,
+                            amount: 10
+                        };
+                        updateDisplay(currentConfig);
+                    }
+                });
+            }
+
+            // --- Toggle Switch ---
+            bonusToggle.addEventListener('click', () => {
+                bonusToggle.classList.toggle('active');
+                const isActive = bonusToggle.classList.contains('active');
+                toggleLabel.textContent = isActive ? 'Enabled' : 'Disabled';
+                toggleLabel.className = `toggle-label${isActive ? ' active' : ''}`;
+                updateStatusDisplay(isActive);
+            });
+
+            // --- Save Config to Firebase ---
+            function saveConfig() {
+                const enabled = bonusToggle.classList.contains('active');
+                const amount = parseFloat(bonusAmount.value);
+
+                // Validate
+                if (isNaN(amount) || amount < 0.01) {
+                    showToast('Bonus amount must be at least 0.01', 'error');
+                    return;
+                }
+
+                // Round to 2 decimal places
+                const roundedAmount = Math.round(amount * 100) / 100;
+
+                const config = {
+                    enabled: enabled,
+                    amount: roundedAmount,
+                    updatedAt: firebase.database.ServerValue.TIMESTAMP
+                };
+
+                saveBtn.disabled = true;
+                saveBtn.innerHTML = '<i class="fa-solid fa-spinner spinner"></i> Saving...';
+
+                rtdb.ref('admin/daily_bonus').update(config).then(() => {
+                    showToast('Daily bonus settings saved successfully!', 'success');
+                    currentConfig = config;
+                    updateDisplay(config);
+                    
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Save Settings';
+                }).catch((error) => {
+                    showToast('Error saving: ' + error.message, 'error');
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Save Settings';
+                });
+            }
+
+            // --- Event Listeners ---
+            document.getElementById('bonus-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                saveConfig();
+            });
+
+            // --- Logout ---
+            logoutBtn.addEventListener('click', () => {
+                auth.signOut().then(() => {
+                    window.location.href = 'login.html';
+                });
+            });
+
+            // --- Auth Check (No Role Required) ---
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    // No role check - anyone logged in can access
+                    loadConfig();
+                } else {
+                    // Not logged in - redirect to login
+                    window.location.href = 'login.html';
+                }
+            });
+
+        });
+    </script>
+</body>
+</html>

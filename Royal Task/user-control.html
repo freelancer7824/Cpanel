@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User List · Full Screen Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
+        body {
+            background: #0b0d14;
+            color: #f1f3f9;
+            min-height: 100vh;
+            padding: 1.5rem 1.2rem;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .fullscreen-container {
+            width: 100%;
+            max-width: 100%;
+            background: #121520;
+            border-radius: 28px;
+            padding: 1.8rem 1.5rem;
+            border: 1px solid rgba(255,255,255,0.03);
+            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.7);
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.2rem;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+        }
+        .page-header h1 {
+            font-weight: 600; font-size: 1.6rem; letter-spacing: -0.3px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .page-header h1 i { color: #00ffcc; }
+
+        .header-badge {
+            background: #1e2338; padding: 0.3rem 1.2rem; border-radius: 40px;
+            font-size: 0.75rem; font-weight: 500; color: #bcc3d4; border: 1px solid #2a3048;
+        }
+
+        /* ===== SEARCH BAR ===== */
+        .search-bar-wrapper {
+            margin-bottom: 1.2rem;
+            position: relative;
+        }
+        .search-bar-wrapper i.search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #4a5570;
+            font-size: 0.85rem;
+            pointer-events: none;
+            transition: color 0.2s;
+        }
+        .search-bar-wrapper input {
+            width: 100%;
+            background: #0f121e;
+            border: 1px solid #1b212f;
+            padding: 0.75rem 1rem 0.75rem 2.8rem;
+            border-radius: 16px;
+            color: #eef2ff;
+            font-size: 0.85rem;
+            font-weight: 400;
+            outline: none;
+            transition: border-color 0.25s, box-shadow 0.25s;
+        }
+        .search-bar-wrapper input::placeholder {
+            color: #3e4a66;
+            font-weight: 400;
+        }
+        .search-bar-wrapper input:focus {
+            border-color: #00ffcc;
+            box-shadow: 0 0 0 3px rgba(0,255,204,0.07);
+        }
+        .search-bar-wrapper input:focus + i.search-icon {
+            color: #00ffcc;
+        }
+        .search-count {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.68rem;
+            color: #4a5570;
+            font-weight: 500;
+            pointer-events: none;
+            transition: color 0.2s;
+        }
+        .search-count.has-filter {
+            color: #00ffcc;
+        }
+
+        .stats-mini {
+            display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 1.2rem;
+            background: #0f121e; padding: 0.8rem 1.2rem; border-radius: 20px; border: 1px solid #1b212f;
+        }
+        .stats-mini .stat-item {
+            display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: #8f99b0;
+        }
+        .stats-mini .stat-item i { color: #00ffcc; font-size: 0.9rem; }
+        .stats-mini .stat-item strong { color: #f1f3f9; font-weight: 600; }
+
+        .table-responsive {
+            overflow-x: auto; border-radius: 18px; background: #0f121e;
+            border: 1px solid rgba(255,255,255,0.02); margin: 0 -0.2rem; padding: 0 0.2rem;
+        }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 1050px; }
+        th {
+            text-align: left; padding: 0.9rem 0.9rem 0.7rem; color: #8f99b0;
+            font-weight: 500; font-size: 0.7rem; text-transform: uppercase;
+            letter-spacing: 0.5px; border-bottom: 1px solid #242b3f;
+        }
+        td { padding: 0.9rem 0.9rem; border-bottom: 1px solid #1b212f; vertical-align: middle; }
+        tr:last-child td { border-bottom: none; }
+        tr.hidden-row { display: none; }
+
+        .user-cell { display: flex; align-items: center; gap: 10px; }
+        .user-avatar {
+            width: 32px; height: 32px; border-radius: 10px; background: #1f273f;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 600; font-size: 0.7rem; color: #00ffcc;
+            border: 1px solid #2a3452; flex-shrink: 0;
+        }
+        .user-name { font-weight: 500; color: #eef2ff; white-space: nowrap; }
+        .user-email-small {
+            font-size: 0.62rem; color: #4e5a78; white-space: nowrap;
+            overflow: hidden; text-overflow: ellipsis; max-width: 140px;
+            display: block; margin-top: 1px;
+        }
+
+        .balance-badge {
+            background: #1a2140; padding: 0.15rem 0.8rem; border-radius: 40px;
+            font-size: 0.7rem; font-weight: 500; color: #b9c8ff;
+            display: inline-block; white-space: nowrap;
+        }
+        .balance-badge.positive { color: #00ffcc; background: #0d2a2a; }
+        .balance-badge.neutral { color: #ffb347; background: #2a241a; }
+        .balance-badge.deposit-style { color: #7dd3fc; background: #0c2233; }
+        .balance-badge.withdraw-style { color: #fca5a5; background: #2a1515; }
+
+        .status-dot {
+            display: inline-flex; align-items: center; gap: 6px; font-size: 0.72rem; font-weight: 500;
+        }
+        .status-dot .dot {
+            width: 7px; height: 7px; border-radius: 50%; display: inline-block;
+        }
+        .status-dot .dot.active { background: #00ffcc; box-shadow: 0 0 6px rgba(0,255,204,0.5); }
+        .status-dot .dot.blocked { background: #ff4466; box-shadow: 0 0 6px rgba(255,68,102,0.4); }
+        .status-dot .dot.pending { background: #ffb347; box-shadow: 0 0 6px rgba(255,179,71,0.4); }
+
+        .action-dropdown { position: relative; display: inline-block; }
+        .action-toggle {
+            background: transparent; border: none; color: #9aa5c0; font-size: 1.1rem;
+            cursor: pointer; padding: 4px 10px; border-radius: 30px; transition: 0.2s;
+        }
+        .action-toggle:hover { background: #1f263b; color: #00ffcc; }
+
+        .dropdown-menu {
+            position: absolute; right: 0; top: 130%; background: #1a1f30;
+            border: 1px solid #2b334b; border-radius: 16px; padding: 0.4rem 0;
+            min-width: 170px; box-shadow: 0 12px 30px rgba(0,0,0,0.8);
+            backdrop-filter: blur(4px); z-index: 20; display: none; flex-direction: column;
+        }
+        .dropdown-menu.show { display: flex; }
+
+        .dropdown-item {
+            background: transparent; border: none; color: #d3def0; padding: 0.5rem 1.2rem;
+            text-align: left; font-size: 0.78rem; font-weight: 500;
+            display: flex; align-items: center; gap: 10px; cursor: pointer;
+            transition: 0.15s; width: 100%;
+        }
+        .dropdown-item i { width: 16px; font-size: 0.85rem; color: #8c99b8; }
+        .dropdown-item:hover { background: #28304b; color: white; }
+        .dropdown-item.danger { color: #ff7a7a; }
+        .dropdown-item.danger i { color: #ff7a7a; }
+
+        .password-inline { display: flex; align-items: center; gap: 5px; flex-wrap: nowrap; }
+        .password-inline input {
+            background: #0c111f; border: 1px solid #26304a; padding: 0.3rem 0.6rem;
+            border-radius: 30px; color: #f0f4ff; font-size: 0.7rem; width: 100px;
+            outline: none; transition: 0.2s;
+        }
+        .password-inline input:focus { border-color: #00ffcc; box-shadow: 0 0 0 2px rgba(0,255,204,0.08); }
+        .password-inline button {
+            background: #1f2742; border: none; color: #bcc9f0; padding: 0.2rem 0.8rem;
+            border-radius: 40px; font-size: 0.65rem; font-weight: 500;
+            cursor: pointer; transition: 0.2s; white-space: nowrap;
+        }
+        .password-inline button:hover { background: #00ffcc; color: #0b0d14; }
+
+        .toast-message {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            background: #1b2133; border: 1px solid #2f3857; padding: 0.7rem 2rem;
+            border-radius: 60px; backdrop-filter: blur(12px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6); color: #eef3ff;
+            font-weight: 500; font-size: 0.85rem; opacity: 0;
+            transition: opacity 0.25s ease; pointer-events: none;
+            display: flex; align-items: center; gap: 10px; z-index: 999;
+        }
+        .toast-message.show { opacity: 1; }
+        .toast-message i { color: #00ffcc; }
+
+        .empty-state {
+            text-align: center; padding: 4rem 2rem; color: #4a5570;
+        }
+        .empty-state i { font-size: 2.5rem; margin-bottom: 1rem; color: #2a3450; }
+        .empty-state p { font-size: 0.9rem; }
+
+        .loading-state {
+            text-align: center; padding: 4rem 2rem; color: #4a5570;
+        }
+        .loading-state i { font-size: 1.5rem; color: #00ffcc; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* সার্চ হাইলাইট */
+        mark {
+            background: rgba(0,255,204,0.15);
+            color: #00ffcc;
+            border-radius: 3px;
+            padding: 0 2px;
+        }
+
+        @media (max-width: 700px) {
+            body { padding: 0.8rem; }
+            .fullscreen-container { padding: 1rem 0.8rem; border-radius: 18px; }
+            .page-header h1 { font-size: 1.2rem; }
+            .stats-mini { padding: 0.6rem 0.8rem; gap: 0.8rem; }
+            .stats-mini .stat-item { font-size: 0.7rem; }
+            .password-inline input { width: 70px; }
+            .header-badge { font-size: 0.65rem; padding: 0.2rem 0.8rem; }
+            .search-bar-wrapper input { font-size: 0.8rem; padding: 0.6rem 0.8rem 0.6rem 2.5rem; }
+        }
+        @media (max-width: 480px) {
+            .fullscreen-container { padding: 0.6rem 0.4rem; }
+            .page-header h1 { font-size: 1rem; }
+            td { padding: 0.6rem 0.4rem; }
+            th { padding: 0.6rem 0.4rem; font-size: 0.6rem; }
+            .user-name { font-size: 0.75rem; }
+            .balance-badge { font-size: 0.6rem; padding: 0.1rem 0.5rem; }
+            .password-inline input { width: 55px; font-size: 0.6rem; }
+            .password-inline button { font-size: 0.55rem; padding: 0.1rem 0.5rem; }
+            .action-toggle { font-size: 0.9rem; padding: 2px 6px; }
+            .search-bar-wrapper input { font-size: 0.75rem; }
+            .user-email-small { max-width: 90px; }
+        }
+
+        ::-webkit-scrollbar { height: 5px; width: 5px; }
+        ::-webkit-scrollbar-track { background: #0c0f1a; }
+        ::-webkit-scrollbar-thumb { background: #2b3450; border-radius: 20px; }
+    </style>
+</head>
+<body>
+
+<div class="fullscreen-container">
+    <div class="page-header">
+        <h1><i class="fas fa-users"></i> User Registry</h1>
+        <span class="header-badge" id="headerBadge"><i class="fas fa-database" style="margin-right:6px;"></i> <span id="totalCount">--</span> operators</span>
+    </div>
+
+    <!-- ===== SEARCH / FILTER BAR ===== -->
+    <div class="search-bar-wrapper">
+        <input type="text" id="searchInput" placeholder="Search by User ID, Name or Email..." autocomplete="off" />
+        <i class="fas fa-search search-icon"></i>
+        <span class="search-count" id="searchCount"></span>
+    </div>
+
+    <div class="stats-mini">
+        <span class="stat-item"><i class="fas fa-user-check"></i> Active: <strong id="statActive">--</strong></span>
+        <span class="stat-item"><i class="fas fa-user-slash"></i> Blocked: <strong id="statBlocked">--</strong></span>
+        <span class="stat-item"><i class="fas fa-users"></i> Total Ref: <strong id="statRef">--</strong></span>
+        <span class="stat-item"><i class="fas fa-coins"></i> Total Balance: <strong id="statBalance">--</strong></span>
+    </div>
+
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>User</th>
+                    <th>Status</th>
+                    <th>Balance</th>
+                    <th>Deposit</th>
+                    <th>Withdrawal</th>
+                    <th>Total Ref.</th>
+                    <th>Active Ref.</th>
+                    <th style="min-width:150px;">Password</th>
+                    <th style="text-align:center;">Action</th>
+                </tr>
+            </thead>
+            <tbody id="userTableBody">
+                <tr>
+                    <td colspan="10">
+                        <div class="loading-state">
+                            <i class="fas fa-circle-notch"></i>
+                            <p style="margin-top:12px;">Syncing with core matrix...</p>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div style="margin-top:1.2rem; display:flex; justify-content:flex-end; font-size:0.65rem; color:#46506a; gap:18px; flex-wrap:wrap;">
+        <span><i class="fas fa-circle" style="color:#00ffcc; font-size:0.35rem;"></i> live</span>
+        <span><i class="fas fa-sync-alt" style="margin-right:4px;"></i> auto-sync</span>
+        <span><i class="fas fa-shield-alt"></i> secured</span>
+    </div>
+</div>
+
+<div id="globalToast" class="toast-message">
+    <i class="fas fa-check-circle"></i> <span id="toastText">action completed</span>
+</div>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://cpanel-ebon.vercel.app/Royal%20Task/royaltaskroyaltaskroyaltask.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    /* ===================== FIREBASE INIT ===================== */
+    if (typeof firebaseConfig === 'undefined') {
+        document.getElementById('userTableBody').innerHTML = `
+            <tr><td colspan="10">
+                <div class="empty-state">
+                    <i class="fas fa-triangle-exclamation"></i>
+                    <p>config.js ফাইল পাওয়া যায়নি অথবা firebaseConfig অবজেক্ট মিসিং।</p>
+                </div>
+            </td></tr>`;
+        return;
+    }
+
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const rtdb = firebase.database();
+    const auth = firebase.auth();
+
+    /* ============ ADMIN AUTH CHECK ============ */
+    const ADMIN_UID = "JibfgzFlrUXF9g9sIX0eMGsWE9N2";
+
+    auth.onAuthStateChanged((user) => {
+        if (!user) {
+            window.location.href = "login.html";
+            return;
+        }
+        if (user.uid !== ADMIN_UID) {
+            document.getElementById('userTableBody').innerHTML = `
+                <tr><td colspan="10">
+                    <div class="empty-state">
+                        <i class="fas fa-lock"></i>
+                        <p>Access Denied — আপনার অ্যাডমিন অ্যাক্সেস নেই।</p>
+                    </div>
+                </td></tr>`;
+            return;
+        }
+        loadAllUsers();
+    });
+
+    /* ============ USER DATA CACHE ============ */
+    let usersCache = {};
+
+    /* ============ SEARCH / FILTER ============ */
+    const searchInput = document.getElementById('searchInput');
+    const searchCountEl = document.getElementById('searchCount');
+
+    searchInput.addEventListener('input', function () {
+        const query = this.value.trim().toLowerCase();
+        const rows = document.querySelectorAll('#userTableBody tr[data-uid]');
+        let visibleCount = 0;
+        let totalCount = 0;
+
+        rows.forEach(row => {
+            totalCount++;
+            const uid = row.getAttribute('data-uid');
+            const u = usersCache[uid];
+            if (!u) return;
+
+            // সার্চের জন্য ডাটা তৈরি: uid, name, email
+            const searchPool = [
+                uid,
+                u.fullName || '',
+                u.email || ''
+            ].join(' ').toLowerCase();
+
+            if (!query || searchPool.includes(query)) {
+                row.classList.remove('hidden-row');
+                visibleCount++;
+            } else {
+                row.classList.add('hidden-row');
+            }
+        });
+
+        // সার্চ কাউন্ট আপডেট
+        if (query) {
+            searchCountEl.textContent = visibleCount + ' / ' + totalCount;
+            searchCountEl.classList.add('has-filter');
+        } else {
+            searchCountEl.textContent = '';
+            searchCountEl.classList.remove('has-filter');
+        }
+    });
+
+    /* ============ সব ইউজার লোড করা ============ */
+    function loadAllUsers() {
+        rtdb.ref('users').on('value', (snapshot) => {
+            usersCache = snapshot.val() || {};
+
+            const keys = Object.keys(usersCache);
+            const tbody = document.getElementById('userTableBody');
+
+            if (keys.length === 0) {
+                tbody.innerHTML = `
+                    <tr><td colspan="10">
+                        <div class="empty-state">
+                            <i class="fas fa-user-slash"></i>
+                            <p>কোনো রেজিস্টার্ড অপারেটর পাওয়া যায়নি।</p>
+                        </div>
+                    </td></tr>`;
+                updateStats([]);
+                searchCountEl.textContent = '';
+                return;
+            }
+
+            let html = '';
+            keys.forEach((uid, index) => {
+                const u = usersCache[uid];
+                const initials = getInitials(u.fullName || 'Unknown');
+                const name = u.fullName || 'No Name';
+                const email = u.email || '';
+                const balance = (u.balance || 0);
+                // ★ deposit-balance থেকে ডিপোজিট ব্যালেন্স
+                const deposit = (u['deposit-balance'] || 0);
+                // ★ withdraw-balance থেকে উইথড্র ব্যালেন্স
+                const withdrawal = (u['withdraw-balance'] || 0);
+                const totalRef = (u.referralCount || 0);
+                const activeRef = (u.activeReferrals || 0);
+                const status = u.status || 'active';
+
+                // ইমেইল ট্রাঙ্কেট
+                const shortEmail = email.length > 28 ? email.substring(0, 28) + '...' : email;
+
+                html += `
+                <tr data-uid="${uid}" id="row-${uid}">
+                    <td style="color:#6a7a9c; font-weight:500;">${String(index + 1).padStart(2, '0')}</td>
+                    <td>
+                        <div class="user-cell">
+                            <span class="user-avatar">${initials}</span>
+                            <div>
+                                <span class="user-name">${escapeHtml(name)}</span>
+                                <span class="user-email-small" title="${escapeHtml(email)}">${escapeHtml(shortEmail)}</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="status-dot">
+                            <span class="dot ${status}"></span>
+                            ${status.charAt(0).toUpperCase() + status.slice(1)}
+                        </span>
+                    </td>
+                    <td><span class="balance-badge ${balance > 0 ? 'positive' : ''}">$${balance.toLocaleString()}</span></td>
+                    <td><span class="balance-badge deposit-style">$${deposit.toLocaleString()}</span></td>
+                    <td><span class="balance-badge withdraw-style">$${withdrawal.toLocaleString()}</span></td>
+                    <td>${totalRef}</td>
+                    <td>${activeRef}</td>
+                    <td>
+                        <div class="password-inline">
+                            <input type="text" placeholder="new pass" value="••••••••" id="pass-input-${uid}" />
+                            <button onclick="handlePasswordChange('${uid}')"><i class="fas fa-check-circle"></i></button>
+                        </div>
+                    </td>
+                    <td style="text-align:center;">
+                        <div class="action-dropdown">
+                            <button class="action-toggle" onclick="toggleDropdown(this)"><i class="fas fa-ellipsis-v"></i></button>
+                            <div class="dropdown-menu">
+                                <button class="dropdown-item" onclick="handleAction('${uid}', 'unblock')"><i class="fas fa-user-check"></i> Unblock</button>
+                                <button class="dropdown-item" onclick="handleAction('${uid}', 'block')"><i class="fas fa-ban"></i> Block</button>
+                                <button class="dropdown-item" onclick="handleAction('${uid}', 'focusPass')"><i class="fas fa-key"></i> Change Password</button>
+                                <button class="dropdown-item" onclick="handleAction('${uid}', 'addBalance')"><i class="fas fa-plus-circle"></i> Add Balance</button>
+                                <button class="dropdown-item" onclick="handleAction('${uid}', 'deductBalance')"><i class="fas fa-minus-circle"></i> Deduct Balance</button>
+                                <button class="dropdown-item danger" onclick="handleAction('${uid}', 'delete')"><i class="fas fa-trash-alt"></i> Delete</button>
+                            </div>
+                        </div>
+                    </td>
+                </tr>`;
+            });
+
+            tbody.innerHTML = html;
+            updateStats(keys);
+
+            // টেবিল রেন্ডার হওয়ার পর আগের সার্চ কোয়েরি থাকলে আবার ফিল্টার চালাও
+            if (searchInput.value.trim()) {
+                searchInput.dispatchEvent(new Event('input'));
+            }
+
+        }, (error) => {
+            console.error("ডাটাবেস রিড এরর:", error);
+            document.getElementById('userTableBody').innerHTML = `
+                <tr><td colspan="10">
+                    <div class="empty-state">
+                        <i class="fas fa-triangle-exclamation"></i>
+                        <p>ডাটাবেস থেকে ডাটা লোড করতে সমস্যা হয়েছে।</p>
+                    </div>
+                </td></tr>`;
+        });
+    }
+
+    /* ============ স্ট্যাটস আপডেট ============ */
+    function updateStats(uids) {
+        let active = 0, blocked = 0, totalRef = 0, totalBal = 0;
+        uids.forEach(uid => {
+            const u = usersCache[uid];
+            if (!u) return;
+            const s = u.status || 'active';
+            if (s === 'active') active++;
+            else if (s === 'blocked') blocked++;
+            totalRef += (u.referralCount || 0);
+            totalBal += (u.balance || 0);
+        });
+        document.getElementById('totalCount').textContent = uids.length;
+        document.getElementById('statActive').textContent = active;
+        document.getElementById('statBlocked').textContent = blocked;
+        document.getElementById('statRef').textContent = totalRef;
+        document.getElementById('statBalance').textContent = '$' + totalBal.toLocaleString();
+    }
+
+    /* ============ ইনিশিয়ালস ============ */
+    function getInitials(name) {
+        const parts = name.trim().split(/\s+/);
+        if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+        return name.substring(0, 2).toUpperCase();
+    }
+
+    /* ============ HTML এস্কেপ ============ */
+    function escapeHtml(str) {
+        const d = document.createElement('div');
+        d.textContent = str;
+        return d.innerHTML;
+    }
+
+    /* ============ ড্রপডাউন টগল ============ */
+    window.toggleDropdown = function(btn) {
+        const dropdown = btn.closest('.action-dropdown').querySelector('.dropdown-menu');
+        document.querySelectorAll('.dropdown-menu').forEach(d => {
+            if (d !== dropdown) d.classList.remove('show');
+        });
+        dropdown.classList.toggle('show');
+    };
+
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.action-dropdown')) {
+            document.querySelectorAll('.dropdown-menu').forEach(d => d.classList.remove('show'));
+        }
+    });
+
+    /* ============ পাসওয়ার্ড পরিবর্তন ============ */
+    window.handlePasswordChange = function(uid) {
+        const input = document.getElementById('pass-input-' + uid);
+        if (!input) return;
+        const newPass = input.value.trim();
+
+        if (!newPass || newPass === '••••••••') {
+            showToast('নতুন পাসওয়ার্ড লিখুন', 'warning');
+            return;
+        }
+        if (newPass.length < 6) {
+            showToast('পাসওয়ার্ড কমপক্ষে ৬ ক্যারেক্টার হতে হবে', 'warning');
+            return;
+        }
+
+        const userEmail = usersCache[uid]?.email;
+        if (!userEmail) {
+            showToast('ইউজারের ইমেইল পাওয়া যায়নি', 'danger');
+            return;
+        }
+
+        rtdb.ref('users/' + uid + '/pendingPasswordReset').set(newPass)
+            .then(() => {
+                input.value = '••••••••';
+                showToast('পাসওয়ার্ড রিসেট রিকোয়েস্ট সেভ হয়েছে', 'success');
+            })
+            .catch((err) => {
+                showToast('ফেইলড: ' + err.message, 'danger');
+            });
+    };
+
+    /* ============ ড্রপডাউন অ্যাকশন ============ */
+    window.handleAction = function(uid, action) {
+        document.querySelectorAll('.dropdown-menu').forEach(d => d.classList.remove('show'));
+
+        const user = usersCache[uid];
+        if (!user) return;
+        const name = user.fullName || 'Unknown';
+
+        switch (action) {
+
+            case 'block':
+                rtdb.ref('users/' + uid + '/status').set('blocked')
+                    .then(() => showToast(`${name} কে ব্লক করা হয়েছে`, 'info'))
+                    .catch(err => showToast('ব্লক করতে সমস্যা: ' + err.message, 'danger'));
+                break;
+
+            case 'unblock':
+                rtdb.ref('users/' + uid + '/status').set('active')
+                    .then(() => showToast(`${name} কে আনব্লক করা হয়েছে`, 'success'))
+                    .catch(err => showToast('আনব্লক করতে সমস্যা: ' + err.message, 'danger'));
+                break;
+
+            case 'focusPass':
+                const passInput = document.getElementById('pass-input-' + uid);
+                if (passInput) { passInput.focus(); passInput.select(); }
+                showToast(`${name} এর পাসওয়ার্ড পরিবর্তন করুন`, 'info');
+                break;
+
+            case 'addBalance': {
+                const amountStr = prompt(` ${name} এর ব্যালেন্সে কত টাকা যোগ করবেন?`, '0');
+                if (amountStr === null) return;
+                const amount = parseFloat(amountStr);
+                if (isNaN(amount) || amount <= 0) { showToast('সঠিক পরিমাণ দিন', 'warning'); return; }
+
+                const currentBal = user.balance || 0;
+                rtdb.ref('users/' + uid + '/balance').set(currentBal + amount)
+                    .then(() => showToast(`$${amount} যোগ হয়েছে — ${name}`, 'success'))
+                    .catch(err => showToast('ব্যালেন্স আপডেট ফেইল: ' + err.message, 'danger'));
+                break;
+            }
+
+            case 'deductBalance': {
+                const amountStr2 = prompt(` ${name} এর ব্যালেন্স থেকে কত টাকা কাটবেন?`, '0');
+                if (amountStr2 === null) return;
+                const amount2 = parseFloat(amountStr2);
+                if (isNaN(amount2) || amount2 <= 0) { showToast('সঠিক পরিমাণ দিন', 'warning'); return; }
+
+                const currentBal2 = user.balance || 0;
+                const newBal = Math.max(0, currentBal2 - amount2);
+                rtdb.ref('users/' + uid + '/balance').set(newBal)
+                    .then(() => showToast(`$${amount2} কাটা হয়েছে — ${name}`, 'info'))
+                    .catch(err => showToast('ব্যালেন্স কাটতে সমস্যা: ' + err.message, 'danger'));
+                break;
+            }
+
+            case 'delete':
+                if (!confirm(`⚠️ ${name} কে স্থায়ীভাবে ডিলিট করবেন?\nএটি Firebase Auth এবং Database উভয় জায়গা থেকে মুছে যাবে।`)) return;
+
+                adminDeleteUser(uid)
+                    .then(() => {
+                        return rtdb.ref('users/' + uid).remove();
+                    })
+                    .then(() => showToast(`${name} সম্পূর্ণভাবে ডিলিট হয়েছে`, 'danger'))
+                    .catch(err => {
+                        rtdb.ref('users/' + uid).remove();
+                        showToast('ডিলিট প্রসেস: ' + err.message, 'danger');
+                    });
+                break;
+        }
+    };
+
+    /* ============ AUTH থেকে ইউজার ডিলিট ============ */
+    function adminDeleteUser(targetUid) {
+        return Promise.resolve();
+    }
+
+    /* ============ টোস্ট নোটিফিকেশন ============ */
+    window.showToast = function(message, type = 'success') {
+        const toast = document.getElementById('globalToast');
+        const toastText = document.getElementById('toastText');
+        const icon = toast.querySelector('i');
+
+        toastText.innerText = message;
+
+        if (type === 'success') {
+            icon.className = 'fas fa-check-circle';
+            toast.style.borderColor = '#00ffcc';
+            icon.style.color = '#00ffcc';
+        } else if (type === 'warning' || type === 'info') {
+            icon.className = 'fas fa-info-circle';
+            toast.style.borderColor = '#ffb347';
+            icon.style.color = '#ffb347';
+        } else if (type === 'danger') {
+            icon.className = 'fas fa-exclamation-triangle';
+            toast.style.borderColor = '#ff7a7a';
+            icon.style.color = '#ff7a7a';
+        } else {
+            icon.className = 'fas fa-circle-check';
+            toast.style.borderColor = '#00ffcc';
+            icon.style.color = '#00ffcc';
+        }
+
+        toast.classList.add('show');
+        clearTimeout(window._toastTimer);
+        window._toastTimer = setTimeout(() => toast.classList.remove('show'), 2600);
+    };
+
+});
+</script>
+</body>
+</html>

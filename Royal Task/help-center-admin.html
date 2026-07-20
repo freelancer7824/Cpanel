@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Help Center Tickets</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #0b0e14;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .admin-container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            background: linear-gradient(145deg, #141a24, #1a212e);
+            border-radius: 32px;
+            padding: 40px 35px 45px;
+            box-shadow: 0 30px 60px -10px rgba(0, 0, 0, 0.9), inset 0 1px 2px rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(0, 200, 255, 0.10);
+            flex-wrap: wrap;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .header-icon {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, #ff6b35, #ff4500);
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: #fff;
+            box-shadow: 0 8px 24px rgba(255, 70, 0, 0.30);
+            flex-shrink: 0;
+        }
+
+        .header-text h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #f0f4fa;
+            letter-spacing: -0.5px;
+        }
+
+        .header-text .sub {
+            font-size: 14px;
+            color: #8896a8;
+            font-weight: 400;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .header-text .sub .live-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #00ff88;
+            border-radius: 50%;
+            animation: pulse-dot 1.8s infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 0.3; transform: scale(0.85); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        .header-text .sub .badge-admin {
+            background: rgba(255, 70, 0, 0.12);
+            border: 1px solid rgba(255, 70, 0, 0.08);
+            padding: 4px 14px;
+            border-radius: 30px;
+            font-size: 12px;
+            color: #ff6b35;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .stats-badge {
+            background: rgba(0, 200, 255, 0.06);
+            border: 1px solid rgba(0, 200, 255, 0.08);
+            padding: 8px 18px;
+            border-radius: 12px;
+            color: #66d9ff;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stats-badge i {
+            font-size: 14px;
+        }
+
+        .stats-badge span {
+            color: #e8edf5;
+            font-size: 16px;
+        }
+
+        /* ===== TICKET FILTERS ===== */
+        .filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 30px;
+            color: #8896a8;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .filter-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #e8edf5;
+        }
+
+        .filter-btn.active {
+            background: rgba(0, 200, 255, 0.08);
+            border-color: rgba(0, 200, 255, 0.15);
+            color: #66d9ff;
+        }
+
+        .filter-btn .count {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1px 8px;
+            border-radius: 20px;
+            font-size: 11px;
+            margin-left: 4px;
+        }
+
+        /* ===== TICKET LIST ===== */
+        .ticket-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .ticket-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 16px;
+            padding: 20px 24px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .ticket-card:hover {
+            border-color: rgba(0, 200, 255, 0.08);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .ticket-card .ticket-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+
+        .ticket-card .ticket-user {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .ticket-card .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00c8ff, #0077ff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 700;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .ticket-card .user-info .name {
+            font-size: 15px;
+            font-weight: 600;
+            color: #e8edf5;
+        }
+
+        .ticket-card .user-info .email {
+            font-size: 12px;
+            color: #5e6f82;
+        }
+
+        .ticket-card .ticket-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .ticket-card .ticket-status {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 4px 14px;
+            border-radius: 30px;
+            white-space: nowrap;
+        }
+
+        .ticket-card .ticket-status.pending {
+            background: rgba(255, 180, 0, 0.10);
+            color: #ffc44d;
+            border: 1px solid rgba(255, 180, 0, 0.08);
+        }
+
+        .ticket-card .ticket-status.resolved {
+            background: rgba(0, 255, 136, 0.06);
+            color: #5dffa0;
+            border: 1px solid rgba(0, 255, 136, 0.06);
+        }
+
+        .ticket-card .ticket-status.replied {
+            background: rgba(0, 200, 255, 0.06);
+            color: #66d9ff;
+            border: 1px solid rgba(0, 200, 255, 0.06);
+        }
+
+        .ticket-card .ticket-category {
+            font-size: 11px;
+            color: #5e6f82;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 4px 12px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .ticket-card .ticket-subject {
+            font-size: 16px;
+            font-weight: 600;
+            color: #e8edf5;
+            margin: 8px 0 6px;
+        }
+
+        .ticket-card .ticket-message {
+            font-size: 14px;
+            color: #9aabbd;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .ticket-card .ticket-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .ticket-card .ticket-date {
+            font-size: 12px;
+            color: #5e6f82;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .ticket-card .ticket-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .ticket-card .action-btn {
+            padding: 6px 16px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .ticket-card .action-btn.reply {
+            background: rgba(0, 200, 255, 0.10);
+            color: #66d9ff;
+            border: 1px solid rgba(0, 200, 255, 0.08);
+        }
+
+        .ticket-card .action-btn.reply:hover {
+            background: rgba(0, 200, 255, 0.15);
+        }
+
+        .ticket-card .action-btn.resolve {
+            background: rgba(0, 255, 136, 0.06);
+            color: #5dffa0;
+            border: 1px solid rgba(0, 255, 136, 0.06);
+        }
+
+        .ticket-card .action-btn.resolve:hover {
+            background: rgba(0, 255, 136, 0.10);
+        }
+
+        .ticket-card .action-btn.delete {
+            background: rgba(255, 70, 70, 0.06);
+            color: #ff6b6b;
+            border: 1px solid rgba(255, 70, 70, 0.06);
+        }
+
+        .ticket-card .action-btn.delete:hover {
+            background: rgba(255, 70, 70, 0.10);
+        }
+
+        /* ===== MODAL ===== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-box {
+            background: #1a212e;
+            border-radius: 24px;
+            padding: 35px;
+            max-width: 600px;
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-box .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .modal-box .modal-header h2 {
+            font-size: 20px;
+            color: #e8edf5;
+        }
+
+        .modal-box .modal-header .close-btn {
+            background: none;
+            border: none;
+            color: #5e6f82;
+            font-size: 24px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .modal-box .modal-header .close-btn:hover {
+            color: #e8edf5;
+            transform: rotate(90deg);
+        }
+
+        .modal-box .modal-body {
+            margin-bottom: 20px;
+        }
+
+        .modal-box .modal-body .ticket-detail {
+            margin-bottom: 15px;
+        }
+
+        .modal-box .modal-body .ticket-detail .label {
+            font-size: 12px;
+            color: #5e6f82;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .modal-box .modal-body .ticket-detail .value {
+            font-size: 15px;
+            color: #e8edf5;
+            line-height: 1.5;
+        }
+
+        .modal-box .modal-body .ticket-detail .value.email {
+            color: #66d9ff;
+        }
+
+        .modal-box .reply-area {
+            margin-top: 15px;
+        }
+
+        .modal-box .reply-area textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 14px 18px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            color: #e8edf5;
+            font-size: 14px;
+            resize: vertical;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .modal-box .reply-area textarea:focus {
+            border-color: rgba(0, 200, 255, 0.20);
+        }
+
+        .modal-box .reply-area textarea::placeholder {
+            color: #4a5a6e;
+        }
+
+        .modal-box .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .modal-box .modal-actions button {
+            padding: 10px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            border: none;
+            flex: 1;
+        }
+
+        .modal-box .modal-actions .btn-send {
+            background: linear-gradient(135deg, #00c8ff, #0077ff);
+            color: #fff;
+        }
+
+        .modal-box .modal-actions .btn-send:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 150, 255, 0.30);
+        }
+
+        .modal-box .modal-actions .btn-close-modal {
+            background: rgba(255, 255, 255, 0.03);
+            color: #8896a8;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .modal-box .modal-actions .btn-close-modal:hover {
+            background: rgba(255, 255, 255, 0.06);
+            color: #e8edf5;
+        }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #5e6f82;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            color: #3a4a5e;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .empty-state h3 {
+            color: #8896a8;
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .admin-container {
+                padding: 25px 18px 30px;
+                border-radius: 24px;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .header-right {
+                justify-content: space-between;
+            }
+
+            .header-text h1 {
+                font-size: 22px;
+            }
+
+            .ticket-card {
+                padding: 16px 18px;
+            }
+
+            .ticket-card .ticket-header {
+                flex-direction: column;
+            }
+
+            .ticket-card .ticket-footer {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .ticket-card .ticket-actions {
+                justify-content: stretch;
+            }
+
+            .ticket-card .action-btn {
+                flex: 1;
+                justify-content: center;
+            }
+
+            .modal-box {
+                padding: 25px 20px;
+            }
+
+            .filters {
+                gap: 6px;
+            }
+
+            .filter-btn {
+                font-size: 12px;
+                padding: 6px 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .admin-container {
+                padding: 18px 12px 22px;
+                border-radius: 18px;
+            }
+
+            .header-icon {
+                width: 44px;
+                height: 44px;
+                font-size: 22px;
+            }
+
+            .header-text h1 {
+                font-size: 18px;
+            }
+
+            .header-text .sub {
+                font-size: 12px;
+            }
+
+            .stats-badge {
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+
+            .ticket-card .ticket-subject {
+                font-size: 14px;
+            }
+
+            .ticket-card .ticket-message {
+                font-size: 13px;
+            }
+
+            .modal-box .modal-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="admin-container">
+        <!-- ===== HEADER ===== -->
+        <div class="header">
+            <div class="header-left">
+                <div class="header-icon">
+                    <i class="fas fa-ticket"></i>
+                </div>
+                <div class="header-text">
+                    <h1>🎫 Support Tickets</h1>
+                    <div class="sub">
+                        <span class="live-dot"></span>
+                        Live Admin Panel
+                        <span class="badge-admin">
+                            <i class="fas fa-shield-alt"></i> Admin
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="stats-badge">
+                    <i class="fas fa-clock"></i>
+                    Pending: <span id="pendingCount">0</span>
+                </div>
+                <div class="stats-badge">
+                    <i class="fas fa-check-circle"></i>
+                    Total: <span id="totalCount">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== FILTERS ===== -->
+        <div class="filters" id="filters">
+            <button class="filter-btn active" data-filter="all">
+                <i class="fas fa-list"></i> All <span class="count" id="allCount">0</span>
+            </button>
+            <button class="filter-btn" data-filter="pending">
+                <i class="fas fa-clock"></i> Pending <span class="count" id="pendingFilterCount">0</span>
+            </button>
+            <button class="filter-btn" data-filter="replied">
+                <i class="fas fa-reply"></i> Replied <span class="count" id="repliedFilterCount">0</span>
+            </button>
+            <button class="filter-btn" data-filter="resolved">
+                <i class="fas fa-check-circle"></i> Resolved <span class="count" id="resolvedFilterCount">0</span>
+            </button>
+        </div>
+
+        <!-- ===== TICKET LIST ===== -->
+        <div class="ticket-list" id="ticketList">
+            <div class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <h3>No Tickets Found</h3>
+                <p>Support tickets will appear here when users submit them.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL ===== -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h2><i class="fas fa-reply" style="color:#66d9ff;"></i> Reply to Ticket</h2>
+                <button class="close-btn" id="modalCloseBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="ticket-detail">
+                    <div class="label">From</div>
+                    <div class="value" id="modalUserName">User Name</div>
+                    <div class="value email" id="modalUserEmail">user@email.com</div>
+                </div>
+                <div class="ticket-detail">
+                    <div class="label">Subject</div>
+                    <div class="value" id="modalSubject">Ticket Subject</div>
+                </div>
+                <div class="ticket-detail">
+                    <div class="label">Message</div>
+                    <div class="value" id="modalMessage">Ticket message content here...</div>
+                </div>
+                <div class="reply-area">
+                    <div class="label" style="font-size:12px;color:#5e6f82;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">
+                        <i class="fas fa-pencil"></i> Your Reply
+                    </div>
+                    <textarea id="replyInput" placeholder="Type your reply here..."></textarea>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-send" id="sendReplyBtn">
+                    <i class="fas fa-paper-plane"></i> Send Reply
+                </button>
+                <button class="btn-close-modal" id="modalCloseBtn2">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== FIREBASE CONFIG ===== -->
+    <script src="https://cpanel-ebon.vercel.app/Royal%20Task/royaltaskroyaltaskroyaltask.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+    <script>
+        // ========================================
+        // FIREBASE INIT
+        // ========================================
+        let db = null;
+        let allTickets = [];
+        let currentFilter = 'all';
+        let currentTicketId = null;
+
+        if (typeof firebaseConfig !== 'undefined') {
+            if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+            db = firebase.database();
+            console.log('✅ Firebase connected');
+        } else {
+            console.warn('⚠️ Firebase config not loaded. Using demo mode.');
+            // Demo data
+            loadDemoTickets();
+        }
+
+        // ========================================
+        // DOM ELEMENTS
+        // ========================================
+        const ticketList = document.getElementById('ticketList');
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const modalOverlay = document.getElementById('modalOverlay');
+        const modalCloseBtn = document.getElementById('modalCloseBtn');
+        const modalCloseBtn2 = document.getElementById('modalCloseBtn2');
+        const sendReplyBtn = document.getElementById('sendReplyBtn');
+        const replyInput = document.getElementById('replyInput');
+
+        // ========================================
+        // DEMO DATA (Fallback)
+        // ========================================
+        function loadDemoTickets() {
+            const demoTickets = [
+                {
+                    id: 'demo1',
+                    name: 'John Doe',
+                    email: 'john@example.com',
+                    category: 'technical',
+                    subject: 'Cannot login to dashboard',
+                    message: 'I am trying to login but getting error 500. Please help.',
+                    status: 'pending',
+                    createdAt: Date.now() - 3600000
+                },
+                {
+                    id: 'demo2',
+                    name: 'Jane Smith',
+                    email: 'jane@example.com',
+                    category: 'withdrawal',
+                    subject: 'Withdrawal not processed',
+                    message: 'My withdrawal request has been pending for 2 days. Transaction ID: TX123456',
+                    status: 'replied',
+                    createdAt: Date.now() - 7200000
+                },
+                {
+                    id: 'demo3',
+                    name: 'Mike Johnson',
+                    email: 'mike@example.com',
+                    category: 'deposit',
+                    subject: 'Deposit not showing',
+                    message: 'I deposited 100 USDT but it is not showing in my balance. TX: 0x789...',
+                    status: 'resolved',
+                    createdAt: Date.now() - 10800000
+                }
+            ];
+            allTickets = demoTickets;
+            renderTickets();
+        }
+
+        // ========================================
+        // LOAD TICKETS FROM FIREBASE
+        // ========================================
+        function loadTickets() {
+            if (!db) {
+                // Already loaded demo
+                return;
+            }
+
+            db.ref('helpTickets').orderByChild('createdAt').once('value').then(snap => {
+                const tickets = [];
+                snap.forEach(child => {
+                    tickets.push(child.val());
+                });
+                // Sort by newest first
+                tickets.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+                allTickets = tickets;
+                renderTickets();
+            }).catch(err => {
+                console.error('Error loading tickets:', err);
+                loadDemoTickets();
+            });
+
+            // Real-time listener
+            db.ref('helpTickets').on('value', snap => {
+                const tickets = [];
+                snap.forEach(child => {
+                    tickets.push(child.val());
+                });
+                tickets.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+                allTickets = tickets;
+                renderTickets();
+            });
+        }
+
+        // ========================================
+        // RENDER TICKETS
+        // ========================================
+        function renderTickets() {
+            // Filter tickets
+            let filtered = allTickets;
+            if (currentFilter !== 'all') {
+                filtered = allTickets.filter(t => t.status === currentFilter);
+            }
+
+            // Update counts
+            const totalCount = allTickets.length;
+            const pendingCount = allTickets.filter(t => t.status === 'pending').length;
+            const repliedCount = allTickets.filter(t => t.status === 'replied').length;
+            const resolvedCount = allTickets.filter(t => t.status === 'resolved').length;
+
+            document.getElementById('totalCount').textContent = totalCount;
+            document.getElementById('pendingCount').textContent = pendingCount;
+            document.getElementById('allCount').textContent = totalCount;
+            document.getElementById('pendingFilterCount').textContent = pendingCount;
+            document.getElementById('repliedFilterCount').textContent = repliedCount;
+            document.getElementById('resolvedFilterCount').textContent = resolvedCount;
+
+            if (filtered.length === 0) {
+                ticketList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <h3>No ${currentFilter === 'all' ? '' : currentFilter} tickets</h3>
+                        <p>${currentFilter === 'all' ? 'No support tickets have been submitted yet.' : `No ${currentFilter} tickets found.`}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            filtered.forEach(ticket => {
+                const statusMap = {
+                    'pending': 'pending',
+                    'replied': 'replied',
+                    'resolved': 'resolved'
+                };
+                const statusClass = statusMap[ticket.status] || 'pending';
+                const statusLabel = ticket.status ? ticket.status.charAt(0).toUpperCase() + ticket.status.slice(1) : 'Pending';
+
+                const date = ticket.createdAt ? new Date(ticket.createdAt) : new Date();
+                const dateStr = date.toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+
+                const initial = ticket.name ? ticket.name.charAt(0).toUpperCase() : 'U';
+                const categoryMap = {
+                    'technical': '🛠️ Technical',
+                    'withdrawal': '💰 Withdrawal',
+                    'deposit': '📥 Deposit',
+                    'referral': '👥 Referral',
+                    'account': '🔐 Account',
+                    'other': '❓ Other'
+                };
+                const categoryLabel = categoryMap[ticket.category] || ticket.category || 'Other';
+
+                html += `
+                    <div class="ticket-card" data-id="${ticket.id}">
+                        <div class="ticket-header">
+                            <div class="ticket-user">
+                                <div class="user-avatar">${initial}</div>
+                                <div class="user-info">
+                                    <div class="name">${ticket.name || 'Unknown'}</div>
+                                    <div class="email">${ticket.email || 'No email'}</div>
+                                </div>
+                            </div>
+                            <div class="ticket-meta">
+                                <span class="ticket-category">${categoryLabel}</span>
+                                <span class="ticket-status ${statusClass}">${statusLabel}</span>
+                            </div>
+                        </div>
+                        <div class="ticket-subject">${ticket.subject || 'No subject'}</div>
+                        <div class="ticket-message">${ticket.message || 'No message'}</div>
+                        <div class="ticket-footer">
+                            <div class="ticket-date">
+                                <i class="far fa-calendar-alt"></i>
+                                ${dateStr}
+                            </div>
+                            <div class="ticket-actions">
+                                <button class="action-btn reply" onclick="openReplyModal('${ticket.id}')">
+                                    <i class="fas fa-reply"></i> Reply
+                                </button>
+                                ${ticket.status !== 'resolved' ? `<button class="action-btn resolve" onclick="resolveTicket('${ticket.id}')">
+                                    <i class="fas fa-check"></i> Resolve
+                                </button>` : ''}
+                                <button class="action-btn delete" onclick="deleteTicket('${ticket.id}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            ticketList.innerHTML = html;
+        }
+
+        // ========================================
+        // FILTER BUTTONS
+        // ========================================
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentFilter = this.dataset.filter;
+                renderTickets();
+            });
+        });
+
+        // ========================================
+        // OPEN REPLY MODAL
+        // ========================================
+        function openReplyModal(ticketId) {
+            currentTicketId = ticketId;
+            const ticket = allTickets.find(t => t.id === ticketId);
+            if (!ticket) return;
+
+            document.getElementById('modalUserName').textContent = ticket.name || 'Unknown';
+            document.getElementById('modalUserEmail').textContent = ticket.email || 'No email';
+            document.getElementById('modalSubject').textContent = ticket.subject || 'No subject';
+            document.getElementById('modalMessage').textContent = ticket.message || 'No message';
+            replyInput.value = '';
+
+            modalOverlay.classList.add('active');
+        }
+
+        // Make function global for onclick
+        window.openReplyModal = openReplyModal;
+
+        // ========================================
+        // CLOSE MODAL
+        // ========================================
+        function closeModal() {
+            modalOverlay.classList.remove('active');
+            currentTicketId = null;
+        }
+
+        modalCloseBtn.addEventListener('click', closeModal);
+        modalCloseBtn2.addEventListener('click', closeModal);
+        modalOverlay.addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+
+        // ========================================
+        // SEND REPLY
+        // ========================================
+        sendReplyBtn.addEventListener('click', function() {
+            const reply = replyInput.value.trim();
+            if (!reply) {
+                alert('Please enter a reply message.');
+                return;
+            }
+
+            if (!currentTicketId) return;
+
+            if (!db) {
+                // Demo mode
+                const ticket = allTickets.find(t => t.id === currentTicketId);
+                if (ticket) {
+                    ticket.status = 'replied';
+                    ticket.reply = reply;
+                    ticket.repliedAt = Date.now();
+                    renderTickets();
+                }
+                closeModal();
+                return;
+            }
+
+            // Update in Firebase
+            const updates = {
+                status: 'replied',
+                reply: reply,
+                repliedAt: Date.now()
+            };
+
+            db.ref('helpTickets/' + currentTicketId).update(updates).then(() => {
+                closeModal();
+                // Show success indicator
+                const btn = sendReplyBtn;
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check"></i> Sent!';
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                }, 2000);
+            }).catch(err => {
+                console.error('Error sending reply:', err);
+                alert('Error sending reply. Please try again.');
+            });
+        });
+
+        // ========================================
+        // RESOLVE TICKET
+        // ========================================
+        function resolveTicket(ticketId) {
+            if (!confirm('Mark this ticket as resolved?')) return;
+
+            if (!db) {
+                // Demo mode
+                const ticket = allTickets.find(t => t.id === ticketId);
+                if (ticket) {
+                    ticket.status = 'resolved';
+                    renderTickets();
+                }
+                return;
+            }
+
+            db.ref('helpTickets/' + ticketId).update({
+                status: 'resolved',
+                resolvedAt: Date.now()
+            }).catch(err => {
+                console.error('Error resolving ticket:', err);
+                alert('Error resolving ticket. Please try again.');
+            });
+        }
+
+        window.resolveTicket = resolveTicket;
+
+        // ========================================
+        // DELETE TICKET
+        // ========================================
+        function deleteTicket(ticketId) {
+            if (!confirm('Are you sure you want to delete this ticket? This action cannot be undone.')) return;
+
+            if (!db) {
+                // Demo mode
+                allTickets = allTickets.filter(t => t.id !== ticketId);
+                renderTickets();
+                return;
+            }
+
+            db.ref('helpTickets/' + ticketId).remove().catch(err => {
+                console.error('Error deleting ticket:', err);
+                alert('Error deleting ticket. Please try again.');
+            });
+        }
+
+        window.deleteTicket = deleteTicket;
+
+        // ========================================
+        // INIT
+        // ========================================
+        document.addEventListener('DOMContentLoaded', function() {
+            if (db) {
+                loadTickets();
+            } else {
+                // Demo mode already loaded
+                renderTickets();
+            }
+        });
+
+        // ========================================
+        // SECURITY
+        // ========================================
+        document.onkeydown = function(e) {
+            if (e.keyCode == 123) return false;
+            if (e.ctrlKey && e.shiftKey && (e.keyCode == 'I'.charCodeAt(0) || e.keyCode == 'J'.charCodeAt(0))) return false;
+            if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false;
+        };
+    </script>
+
+</body>
+</html>

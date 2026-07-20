@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Deposit Requests</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-body: #090a0f;
+            --panel-card: #121420;
+            --accent-neon: #00ffcc;
+            --accent-danger: #ff4a5a;
+            --accent-warning: #ffcc00;
+            --text-main: #f1f3f9;
+            --text-muted: #8a94a6;
+            --card-border: rgba(255, 255, 255, 0.04);
+            --table-hover: #1a1d30;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            padding: 30px;
+            min-height: 100vh;
+        }
+
+        .dashboard-header {
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .dashboard-header h1 {
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        .dashboard-header p {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        /* --- Stats Counter --- */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-box {
+            background: var(--panel-card);
+            border: 1px solid var(--card-border);
+            padding: 20px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .stat-box h3 { font-size: 24px; font-weight: 700; margin-top: 5px; }
+        .stat-box p { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+        .stat-icon {
+            width: 45px; height: 45px;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px;
+        }
+
+        /* --- Filter Buttons --- */
+        .filter-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            color: var(--text-muted);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .filter-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .filter-btn.active {
+            background: rgba(0, 255, 204, 0.1);
+            color: var(--accent-neon);
+            border-color: var(--accent-neon);
+        }
+
+        /* --- Table Container --- */
+        .table-container {
+            background: var(--panel-card);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        th {
+            color: var(--text-muted);
+            font-weight: 600;
+            padding: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            color: var(--text-main);
+            white-space: nowrap;
+        }
+
+        tr:hover td {
+            background-color: var(--table-hover);
+        }
+
+        /* --- Status Badges --- */
+        .badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .badge-pending { background: rgba(255, 204, 0, 0.1); color: var(--accent-warning); }
+        .badge-approved { background: rgba(0, 255, 204, 0.1); color: var(--accent-neon); }
+        .badge-rejected { background: rgba(255, 74, 90, 0.1); color: var(--accent-danger); }
+
+        /* --- Action Buttons --- */
+        .btn-action {
+            padding: 8px 14px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 12px;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-right: 5px;
+        }
+        .btn-approve { background: var(--accent-neon); color: #000; }
+        .btn-approve:hover { box-shadow: 0 0 12px rgba(0, 255, 204, 0.4); }
+        .btn-approve:disabled { opacity: 0.6; cursor: not-allowed; }
+        
+        .btn-reject { background: rgba(255, 74, 90, 0.15); color: var(--accent-danger); border: 1px solid rgba(255, 74, 90, 0.2); }
+        .btn-reject:hover { background: var(--accent-danger); color: #fff; }
+
+        /* --- Copy Feature --- */
+        .txid-clickable {
+            font-family: monospace;
+            cursor: pointer;
+            background: rgba(255,255,255,0.03);
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: 0.2s;
+        }
+        .txid-clickable:hover { color: var(--accent-neon); }
+
+        /* --- Live User Balance Cell --- */
+        .user-balance-cell {
+            font-family: monospace;
+            color: #fff;
+            background: rgba(0, 255, 204, 0.05);
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(0, 255, 204, 0.1);
+            min-width: 80px;
+            text-align: center;
+        }
+        .loading-balance { color: var(--text-muted); font-style: italic; font-size: 11px; }
+
+        /* --- Modal Popup (Rejection Reason) --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(4, 5, 9, 0.85);
+            backdrop-filter: blur(5px);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 999; opacity: 0; pointer-events: none;
+            transition: 0.3s ease;
+        }
+        .modal-overlay.show { opacity: 1; pointer-events: auto; }
+        
+        .modal-box {
+            background: var(--panel-card);
+            border: 1px solid rgba(255, 74, 90, 0.2);
+            padding: 25px; border-radius: 16px;
+            width: 90%; max-width: 400px;
+        }
+        .modal-title { font-size: 18px; font-weight: 600; margin-bottom: 15px; }
+        .modal-textarea {
+            width: 100%; height: 90px;
+            background: #1a1d30; border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 8px; color: #fff; padding: 10px;
+            resize: none; outline: none; margin-bottom: 15px;
+        }
+        .modal-textarea:focus { border-color: var(--accent-danger); }
+        
+        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
+        .modal-btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        .btn-cancel { background: rgba(255,255,255,0.05); color: var(--text-muted); }
+        .btn-confirm-reject { background: var(--accent-danger); color: white; }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-header">
+        <div>
+            <h1>Deposit Verification Desk</h1>
+            <p>Monitor blockchain ledger updates and authorize incoming node capital deposits.</p>
+        </div>
+    </div>
+
+    <!-- Counters -->
+    <div class="stats-grid">
+        <div class="stat-box">
+            <div>
+                <p>Pending Review</p>
+                <h3 id="count-pending" style="color: var(--accent-warning);">0</h3>
+            </div>
+            <div class="stat-icon" style="background: rgba(255, 204, 0, 0.1); color: var(--accent-warning);">
+                <i class="fa-solid fa-hourglass-half"></i>
+            </div>
+        </div>
+        <div class="stat-box">
+            <div>
+                <p>Total Approved</p>
+                <h3 id="count-approved" style="color: var(--accent-neon);">0</h3>
+            </div>
+            <div class="stat-icon" style="background: rgba(0, 255, 204, 0.1); color: var(--accent-neon);">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+        </div>
+        <div class="stat-box">
+            <div>
+                <p>Total Rejected</p>
+                <h3 id="count-rejected" style="color: var(--accent-danger);">0</h3>
+            </div>
+            <div class="stat-icon" style="background: rgba(255, 74, 90, 0.1); color: var(--accent-danger);">
+                <i class="fa-solid fa-circle-xmark"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Buttons -->
+    <div class="filter-container">
+        <button class="filter-btn active" onclick="setFilter('all', this)">All Records</button>
+        <button class="filter-btn" onclick="setFilter('pending', this)">Pending <i class="fa-solid fa-clock" style="font-size:10px; margin-left:4px;"></i></button>
+        <button class="filter-btn" onclick="setFilter('approved', this)">Approved <i class="fa-solid fa-check" style="font-size:10px; margin-left:4px;"></i></button>
+        <button class="filter-btn" onclick="setFilter('rejected', this)">Rejected <i class="fa-solid fa-xmark" style="font-size:10px; margin-left:4px;"></i></button>
+    </div>
+
+    <!-- Data Table -->
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Time</th>
+                    <th>User / ID</th>
+                    <th>Gateway</th>
+                    <th>Amount</th>
+                    <th style="text-align:center;">User Balance (Live)</th>
+                    <th>Transaction ID (TxID)</th>
+                    <th>Status</th>
+                    <th>Control Panel Actions</th>
+                </tr>
+            </thead>
+            <tbody id="deposit-table-body">
+                <tr>
+                    <td colspan="8" style="text-align: center; color: var(--text-muted);">Syncing secure ledger node...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Rejection Reason Modal -->
+    <div class="modal-overlay" id="reject-modal">
+        <div class="modal-box">
+            <div class="modal-title"><i class="fa-solid fa-triangle-exclamation" style="color:var(--accent-danger)"></i> Reason for Rejection</div>
+            <textarea class="modal-textarea" id="reject-reason-input" placeholder="Type specific reason (e.g., Invalid Hash Code or Timeout)"></textarea>
+            <div class="modal-actions">
+                <button class="modal-btn btn-cancel" id="close-modal-btn">Cancel</button>
+                <button class="modal-btn btn-confirm-reject" id="submit-reject-btn">Confirm Reject</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
+    <!-- Make sure you have a config.js file with your firebase config -->
+    <script src="https://cpanel-ebon.vercel.app/Royal%20Task/royaltaskroyaltaskroyaltask.js"></script>
+
+    <script>
+        // Initialize Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const rtdb = firebase.database();
+
+        const tableBody = document.getElementById('deposit-table-body');
+        const rejectModal = document.getElementById('reject-modal');
+        const rejectReasonInput = document.getElementById('reject-reason-input');
+        
+        let targetDepositId = null;
+        let currentFilter = 'all';
+        
+        // Map to store live balance listeners so we can detach them if needed (advanced)
+        // For simplicity in this version, we will fetch balance on render.
+
+        function copyTxID(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = event.target.innerText;
+                event.target.innerText = "Copied!";
+                event.target.style.color = "var(--accent-neon)";
+                setTimeout(() => {
+                    event.target.innerText = originalText;
+                    event.target.style.color = "";
+                }, 1000);
+            });
+        }
+
+        window.setFilter = function(status, btnElement) {
+            currentFilter = status;
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            btnElement.classList.add('active');
+            renderTable(); 
+        }
+
+        let allDeposits = [];
+
+        rtdb.ref('deposits').on('value', (snapshot) => {
+            if (!snapshot.exists()) {
+                tableBody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--text-muted);">No records found.</td></tr>`;
+                updateCounters(0, 0, 0);
+                allDeposits = [];
+                return;
+            }
+
+            allDeposits = [];
+            let pendingCount = 0, approvedCount = 0, rejectedCount = 0;
+
+            snapshot.forEach((childSnapshot) => {
+                const data = childSnapshot.val();
+                data.deposit_id = childSnapshot.key; 
+                allDeposits.push(data);
+            });
+
+            // Sort by timestamp descending (newest first)
+            allDeposits.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+            allDeposits.forEach((data) => {
+                if (data.status === "pending") pendingCount++;
+                else if (data.status === "approved") approvedCount++;
+                else if (data.status === "rejected") rejectedCount++;
+            });
+
+            updateCounters(pendingCount, approvedCount, rejectedCount);
+            renderTable();
+        });
+
+        // --- Helper function to fetch user balance and update cell ---
+        function fetchAndDisplayBalance(userId, cellId) {
+            const cell = document.getElementById(cellId);
+            if(!cell) return;
+
+            cell.innerHTML = `<span class="loading-balance">Checking...</span>`;
+            
+            // CRITICAL: Try 'balance' first, if not found or null, try 'userbalance' or vice versa
+            // Assuming 'balance' is the correct key based on your previous correction.
+            rtdb.ref(`users/${userId}/balance`).once('value').then((snap) => {
+                if (snap.exists() && snap.val() !== null) {
+                    const val = parseFloat(snap.val()).toFixed(2);
+                    cell.innerText = `$${val}`;
+                    cell.className = "user-balance-cell";
+                } else {
+                    // Fallback if key name was different in DB, just show N/A or 0
+                    cell.innerText = "N/A";
+                    cell.style.color = "var(--text-muted)";
+                }
+            }).catch(err => {
+                console.error("Balance fetch error:", err);
+                cell.innerText = "Error";
+            });
+        }
+
+        function renderTable() {
+            if (allDeposits.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--text-muted);">No records found.</td></tr>`;
+                return;
+            }
+
+            const filteredData = allDeposits.filter(data => {
+                if (currentFilter === 'all') return true;
+                return data.status === currentFilter;
+            });
+
+            if (filteredData.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--text-muted);">No records found for this filter.</td></tr>`;
+                return;
+            }
+
+            let rowsHtml = "";
+            filteredData.forEach((data) => {
+                const date = new Date(data.timestamp);
+                const formattedTime = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                const cellId = `bal-${data.deposit_id}`; // Unique ID for the balance cell
+
+                let statusBadge = `<span class="badge badge-pending"><i class="fa-solid fa-spinner fa-spin"></i> Pending</span>`;
+                if (data.status === "approved") {
+                    statusBadge = `<span class="badge badge-approved"><i class="fa-solid fa-check"></i> Approved</span>`;
+                } else if (data.status === "rejected") {
+                    statusBadge = `<span class="badge badge-rejected" title="${data.reason || 'No reason'}"><i class="fa-solid fa-xmark"></i> Rejected</span>`;
+                }
+
+                // Add ID to button for loading state management
+                let actionContent = `<span style="color:var(--text-muted); font-size:12px;">Locked Terminal</span>`;
+                if (data.status === "pending") {
+                    actionContent = `
+                        <button class="btn-action btn-approve" id="btn-approve-${data.deposit_id}" onclick="approveDeposit('${data.deposit_id}')"><i class="fa-solid fa-circle-check"></i> Approve</button>
+                        <button class="btn-action btn-reject" onclick="openRejectModal('${data.deposit_id}')"><i class="fa-solid fa-ban"></i> Reject</button>
+                    `;
+                }
+
+                rowsHtml += `
+                    <tr>
+                        <td style="color: var(--text-muted); font-size:13px;">${formattedTime}</td>
+                        <td>
+                            <span style="font-weight:600; display:block;">${data.username || 'Anonymous'}</span>
+                            <span style="font-size:11px; color:var(--text-muted);">UID: ${data.user_id}</span>
+                        </td>
+                        <td style="font-weight:500;">${data.method}</td>
+                        <td style="color:var(--accent-neon); font-weight:700;">$${data.amount}</td>
+                        <!-- Live Balance Column -->
+                        <td style="text-align:center;"><span id="${cellId}" class="loading-balance">Loading...</span></td>
+                        <td>
+                            <span class="txid-clickable" onclick="copyTxID('${data.txid}')" title="Click to copy string">${data.txid.substring(0, 16)}...</span>
+                        </td>
+                        <td>${statusBadge}</td>
+                        <td>${actionContent}</td>
+                    </tr>
+                `;
+            });
+
+            tableBody.innerHTML = rowsHtml;
+
+            // After HTML is injected, fetch balances for each row
+            filteredData.forEach((data) => {
+                fetchAndDisplayBalance(data.user_id, `bal-${data.deposit_id}`);
+            });
+        }
+
+        function updateCounters(pending, approved, rejected) {
+            document.getElementById('count-pending').innerText = pending;
+            document.getElementById('count-approved').innerText = approved;
+            document.getElementById('count-rejected').innerText = rejected;
+        }
+
+        // --- UPDATED APPROVE METHOD (Fixes Balance Key Issue) ---
+        window.approveDeposit = function(id) {
+            const depositRef = rtdb.ref(`deposits/${id}`);
+            const btn = document.getElementById(`btn-approve-${id}`);
+            const balanceCell = document.getElementById(`bal-${id}`);
+            
+            // Show loading state
+            if(btn) {
+                btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Processing`;
+                btn.disabled = true;
+            }
+
+            depositRef.once('value').then((snapshot) => {
+                const data = snapshot.val();
+                
+                if (data && data.status === "pending") {
+                    const amount = parseFloat(data.amount);
+                    const userId = data.user_id;
+
+                    if (confirm(`Are you sure? This will add $${amount} to User ID: ${userId} balance.`)) {
+                        
+                        // 1. TRANSACTION: Safe balance update
+                        // IMPORTANT: Using 'balance' as key. If your DB uses 'userbalance', change it here.
+                        const userBalanceRef = rtdb.ref(`users/${userId}/balance`);
+
+                        userBalanceRef.transaction((currentBalance) => {
+                            // If balance is null/undefined, treat as 0
+                            return (currentBalance || 0) + amount;
+                        }).then(() => {
+                            // 2. Update Deposit Status to Approved
+                            return depositRef.update({
+                                status: "approved",
+                                processedAt: firebase.database.ServerValue.TIMESTAMP
+                            });
+                        }).then(() => {
+                            alert("Success! Deposit Approved and Balance Added.");
+                            // Manually refresh the specific balance cell to show updated value instantly
+                            if(balanceCell) fetchAndDisplayBalance(userId, `bal-${id}`);
+                        }).catch((error) => {
+                            console.error("Update failed:", error);
+                            alert("Error: " + error.message);
+                            // Reset button if failed
+                            if(btn) {
+                                btn.innerHTML = `<i class="fa-solid fa-circle-check"></i> Approve`;
+                                btn.disabled = false;
+                            }
+                        });
+                    } else {
+                        // User cancelled confirmation
+                        if(btn) {
+                            btn.innerHTML = `<i class="fa-solid fa-circle-check"></i> Approve`;
+                            btn.disabled = false;
+                        }
+                    }
+                } else {
+                    alert("This request is already processed or not found.");
+                    if(btn) {
+                        btn.innerHTML = `<i class="fa-solid fa-circle-check"></i> Approve`;
+                        btn.disabled = false;
+                    }
+                }
+            }).catch(err => {
+                console.error(err);
+                alert("Error fetching deposit data.");
+                if(btn) {
+                    btn.innerHTML = `<i class="fa-solid fa-circle-check"></i> Approve`;
+                    btn.disabled = false;
+                }
+            });
+        };
+
+        window.openRejectModal = function(id) {
+            targetDepositId = id;
+            rejectReasonInput.value = "";
+            rejectModal.classList.add('show');
+        }
+
+        document.getElementById('close-modal-btn').addEventListener('click', () => {
+            rejectModal.classList.remove('show');
+        });
+
+        document.getElementById('submit-reject-btn').addEventListener('click', () => {
+            const reason = rejectReasonInput.value.trim() || "Invalid network data reference.";
+            
+            if (targetDepositId) {
+                rtdb.ref(`deposits/${targetDepositId}`).update({
+                    status: "rejected",
+                    reason: reason
+                }).then(() => {
+                    rejectModal.classList.remove('show');
+                    alert("Request Rejected.");
+                }).catch(err => alert("Operation failed: " + err.message));
+            }
+        });
+    </script>
+</body>
+</html>

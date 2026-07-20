@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Crypto Gateway Settings</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-body: #090a0f;
+            --panel-card: #121420;
+            --accent-neon: #00ffcc;
+            --accent-danger: #ff4a5a;
+            --text-main: #f1f3f9;
+            --text-muted: #8a94a6;
+            --card-border: rgba(255, 255, 255, 0.04);
+            --input-bg: #1a1d30;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            padding: 30px;
+            min-height: 100vh;
+        }
+
+        .dashboard-header {
+            margin-bottom: 35px;
+        }
+        .dashboard-header h1 {
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        .dashboard-header p {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        /* --- Grid Layout --- */
+        .gateway-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 25px;
+        }
+
+        .gateway-card {
+            background: var(--panel-card);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            position: relative;
+            transition: transform 0.2s ease;
+        }
+        .gateway-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .gateway-title {
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        /* --- Form Group --- */
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            background: var(--input-bg);
+            border: 1px solid rgba(255,255,255,0.06);
+            padding: 12px;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            transition: 0.2s;
+        }
+        .form-group input:focus, .form-group select:focus {
+            border-color: var(--accent-neon);
+        }
+
+        /* --- Input Custom Styling --- */
+        .wallet-input {
+            font-family: monospace;
+            letter-spacing: 0.5px;
+        }
+
+        /* --- Status Select Style --- */
+        .status-select { font-weight: 600; }
+        .status-active { color: var(--accent-neon) !important; }
+        .status-inactive { color: var(--accent-danger) !important; }
+
+        /* --- Update Button --- */
+        .btn-save {
+            width: 100%;
+            background: var(--accent-neon);
+            color: #000;
+            border: none;
+            padding: 13px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 20px;
+        }
+        .btn-save:hover {
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.4);
+        }
+
+        .loading-text {
+            color: var(--text-muted);
+            text-align: center;
+            font-size: 15px;
+            grid-column: 1 / -1;
+            padding: 40px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-header">
+        <h1>Crypto Gateway Control Desk</h1>
+        <p>Manage node blockchain networks, wallet deposit addresses, and live routing status.</p>
+    </div>
+
+    <!-- Container for Dynamic Crypto Cards -->
+    <div class="gateway-grid" id="crypto-container">
+        <div class="loading-text">
+            <i class="fa-solid fa-circle-notch fa-spin"></i> Initializing crypto ledger streams...
+        </div>
+    </div>
+
+    <!-- Firebase SDK Compat Core -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
+    <!-- Config File Link -->
+    <script src="https://cpanel-ebon.vercel.app/Royal%20Task/royaltaskroyaltaskroyaltask.js"></script>
+
+    <script>
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        const container = document.getElementById('crypto-container');
+
+        // ডিফল্ট ক্রিপ্টো ডেটা স্ট্রাকচার (প্রথমবার নোডটি ব্ল্যাঙ্ক থাকলে ক্রিয়েট হবে)
+        const defaultCryptoMethods = {
+            usdt: { name: "USDT (TRC20)", crypto: "usdt", address: "TY7r8xP9qWzmK2snXvB5HkLMNo4PqRstUV", icon: "fa-brands fa-ethereum", icon_color: "#26a17b", status: "enabled" },
+            btc: { name: "Bitcoin (BTC)", crypto: "btc", address: "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa", icon: "fa-brands fa-bitcoin", icon_color: "#f7931a", status: "enabled" },
+            trx: { name: "Tron (TRX)", crypto: "trx", address: "TMxS6bYgH2K8M9zWNpQ1v7XsBCp5RtRyE2", icon: "fa-solid fa-circle-nodes", icon_color: "#ef0027", status: "disabled" }
+        };
+
+        // --- ফায়ারবেস থেকে রিয়েল-টাইম ডাটা সিঙ্ক (deposit_methods নোড) ---
+        database.ref('deposit_methods').on('value', (snapshot) => {
+            if (!snapshot.exists()) {
+                // ডাটাবেজ খালি থাকলে ডিফল্ট ডেটা ইনসার্ট করবে
+                database.ref('deposit_methods').set(defaultCryptoMethods);
+                return;
+            }
+
+            const data = snapshot.val();
+            let gridHtml = "";
+
+            Object.keys(data).forEach((key) => {
+                const item = data[key];
+                const isEnabled = item.status === "enabled";
+
+                gridHtml += `
+                    <div class="gateway-card">
+                        <div class="gateway-title">
+                            <i class="${item.icon || 'fa-solid fa-coins'}" style="color: ${item.icon_color || '#fff'};"></i>
+                            ${item.name} Terminal
+                        </div>
+
+                        <div class="form-group">
+                            <label>Display Name (Label)</label>
+                            <input type="text" id="name-${key}" value="${item.name}" placeholder="e.g. USDT (TRC20)">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Crypto Short Code / Network</label>
+                            <input type="text" id="crypto-${key}" value="${item.crypto}" placeholder="e.g. usdt or btc">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Blockchain Wallet Address</label>
+                            <input type="text" class="wallet-input" id="addr-${key}" value="${item.address}" placeholder="Paste full destination address">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Gateway Interface Status</label>
+                            <select id="status-${key}" class="status-select ${isEnabled ? 'status-active' : 'status-inactive'}" onchange="updateSelectColor(this)">
+                                <option value="enabled" ${isEnabled ? 'selected' : ''} class="status-active">🟢 Enabled / Display Live</option>
+                                <option value="disabled" ${!isEnabled ? 'selected' : ''} class="status-inactive">🔴 Disabled / Hide Gateway</option>
+                            </select>
+                        </div>
+
+                        <button class="btn-save" onclick="saveCryptoSettings('${key}')">
+                            <i class="fa-solid fa-network-wired"></i> Push Node Update
+                        </button>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = gridHtml;
+        });
+
+        // সিলেকশন ড্রপডাউন কালার স্টাইলিং কন্ট্রোল
+        function updateSelectColor(selectObj) {
+            if(selectObj.value === 'enabled') {
+                selectObj.className = "status-select status-active";
+            } else {
+                selectObj.className = "status-select status-inactive";
+            }
+        }
+
+        // --- ডাটাবেজে ক্রিপ্টো আপডেট পুশ করার মেইন লজিক ---
+        window.saveCryptoSettings = function(key) {
+            const name = document.getElementById(`name-${key}`).value.trim();
+            const crypto = document.getElementById(`crypto-${key}`).value.trim().toLowerCase();
+            const address = document.getElementById(`addr-${key}`).value.trim();
+            const status = document.getElementById(`status-${key}`).value;
+
+            if(!name || !crypto || !address) {
+                alert("All ledger fields must be filled out before deploying updates.");
+                return;
+            }
+
+            // ফায়ারবেসে নির্দিষ্ট ক্রিপ্টো মেথড নোড আপডেট করা
+            database.ref(`deposit_methods/${key}`).update({
+                name: name,
+                crypto: crypto,
+                address: address,
+                status: status
+            }).then(() => {
+                alert(`Blockchain ledger configurations for ${crypto.toUpperCase()} updated dynamically.`);
+            }).catch((err) => {
+                alert("Terminal synchronization failed: " + err.message);
+            });
+        }
+    </script>
+</body>
+</html>
