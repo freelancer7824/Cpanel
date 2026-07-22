@@ -756,40 +756,40 @@
         <nav class="sidebar" id="sidebar">
             <div class="sidebar-title">Core Features</div>
 
-            <a class="nav-link" data-url="dashboard" data-blockable="true">
+            <a class="nav-link" data-url="../Royal Task/dashboard" data-blockable="true">
                 <i class="fa-solid fa-gauge-high"></i> Dashboard
             </a>
-            <a class="nav-link" data-url="leaderboard" data-blockable="true">
+            <a class="nav-link" data-url="../Royal Task/leaderboard" data-blockable="true">
                 <i class="fa-solid fa-trophy"></i> Leaderboard
             </a>
-            <a class="nav-link" data-url="level-setup" data-blockable="true">
+            <a class="nav-link" data-url="../Royal Task/level-setup" data-blockable="true">
                 <i class="fa-solid fa-crown"></i> Vip Level Setup
             </a>
             
-<a class="nav-link" data-url="notice-update" data-blockable="true">
+<a class="nav-link" data-url="../Royal Task/notice-update" data-blockable="true">
     <i class="fa-solid fa-bullhorn"></i> Notice Update
 </a>
             
 
 
-            <a class="nav-link" data-url="diposit-request" data-blockable="true">
+            <a class="nav-link" data-url="../Royal Task/diposit-request" data-blockable="true">
                 <i class="fa-solid fa-money-bill-wave"></i> Deposit Request
             </a>
 
-            <a class="nav-link" data-url="withdrawal-request" data-blockable="true">
+            <a class="nav-link" data-url="../Royal Task/withdrawal-request" data-blockable="true">
                 <i class="fa-solid fa-wallet"></i> Withdrawal Request
             </a>
-<a class="nav-link" data-url="user-control" data-blockable="true">
+<a class="nav-link" data-url="../Royal Task/user-control" data-blockable="true">
     <i class="fa-solid fa-users-gear"></i> Users Control
 </a>
             
             <div class="sidebar-title">Support</div>
 
-            <a class="nav-link" data-url="../User/profile" data-blockable="true">
+            <a class="nav-link" data-url="../Royal Task/S" data-blockable="true">
                 <i class="fa-solid fa-user-gear"></i> Peyment Getway
             </a>
 
-            <a class="nav-link nav-chat" data-url="help-center-admin" data-blockable="false">
+            <a class="nav-link nav-chat" data-url="../Royal Task/help-center-admin" data-blockable="false">
                 <i class="fa-solid fa-comments"></i> Helps Center
                 <span class="chat-dot"></span>
             </a>
@@ -1240,13 +1240,13 @@
                     link.classList.remove('nav-blocked');
                 });
 
-                const dashboardLink = document.querySelector('.nav-link[data-url="../User/dashboard"]');
+                const dashboardLink = document.querySelector('.nav-link[data-url="../Royal Task/dashboard"]');
                 if (dashboardLink) {
                     document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
                     dashboardLink.classList.add('active');
-                    iframe.src = '../User/dashboard';
+                    iframe.src = '../Royal Task/dashboard';
                 } else {
-                    iframe.src = 'homepage';
+                    iframe.src = '../Royal Task/homepage';
                 }
             }
         }
@@ -1356,7 +1356,7 @@
                 dailyBonusConfig = null;
                 bonusConfigReady = false;
                 updateUI(false);
-                document.getElementById('main-frame').src = 'homepage';
+                document.getElementById('main-frame').src = '../Royal Task/homepage';
             }).catch((error) => {
                 console.error("Sign out error", error);
             });
@@ -1367,7 +1367,7 @@
                 showToast("Access Denied", "Blocked accounts cannot access settings.", "fa-solid fa-lock", true);
                 return;
             }
-            document.getElementById('main-frame').src = '../User/profile';
+            document.getElementById('main-frame').src = '../Royal Task/profile';
         });
 
         // ========================================
@@ -1386,7 +1386,7 @@
                 return;
             }
             
-            document.getElementById('main-frame').src = '../User/notice';
+            document.getElementById('main-frame').src = '../Royal Task/notice';
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
             
             if (window.innerWidth <= 768 && sidebar.classList.contains('active')) {
